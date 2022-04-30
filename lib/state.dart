@@ -18,7 +18,7 @@ class StateModel extends ChangeNotifier {
   double get failurePercentageRounded =>
       ((100 - successPercentageRounded) * 100).round() / 100;
 
-  void refreshSuccessRate() {
+  void refreshSuccessRate() async {
     if (_dices.isEmpty) {
       succesRate = 0;
       notifyListeners();
@@ -67,16 +67,28 @@ class StateModel extends ChangeNotifier {
 
   void setTarget(int target) {
     _target = target;
+    notifyListeners();
     refreshSuccessRate();
   }
 
   void setModifier(int modifier) {
     _modifier = modifier;
+    notifyListeners();
     refreshSuccessRate();
   }
 
   void addDice(int diceNumber) {
+    //enforces dice limitation due to performance
+    if (_dices.isNotEmpty &&
+        _dices
+                .map((e) => e.value)
+                .reduce((value, element) => value * element) >=
+            10e4) {
+      return;
+    }
+
     _dices.add(Dice(diceNumber));
+    notifyListeners();
     refreshSuccessRate();
   }
 
