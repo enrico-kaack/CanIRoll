@@ -13,6 +13,10 @@ class StateModel extends ChangeNotifier {
   List<Dice> get dices => _dices;
 
   double succesRate = 0.0;
+  double get successPercentageRounded => (succesRate * 10000).round() / 100;
+  double get failureRate => 1 - succesRate;
+  double get failurePercentageRounded =>
+      ((100 - successPercentageRounded) * 100).round() / 100;
 
   void refreshSuccessRate() {
     if (_dices.isEmpty) {
@@ -60,12 +64,6 @@ class StateModel extends ChangeNotifier {
     }
     return possibilities;
   }
-
-  double get successPercentageRounded => (succesRate * 10000).round() / 100;
-
-  double get failureRate => 1 - succesRate;
-  double get failurePercentageRounded =>
-      ((100 - successPercentageRounded) * 100).round() / 100;
 
   void setTarget(int target) {
     _target = target;
