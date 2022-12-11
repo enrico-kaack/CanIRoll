@@ -143,8 +143,8 @@ class NumberSwitchWidget extends StatelessWidget {
           NumberPicker(
             itemHeight: 100.0,
             axis: Axis.horizontal,
-            minValue: -100,
-            maxValue: 100,
+            minValue: min,
+            maxValue: max,
             value: value,
             textMapper: textMapper,
             onChanged: onChanged,
