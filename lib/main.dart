@@ -1,3 +1,4 @@
+import 'package:caniroll/probability_gauge.dart';
 import 'package:caniroll/state.dart';
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
@@ -105,10 +106,7 @@ class HomePage extends StatelessWidget {
                   )
                 ],
               ),
-              const Text("Chances for success"),
-              Text(model.successPercentageRounded.toString()),
-              const Text("Chances for failure"),
-              Text(model.failurePercentageRounded.toString()),
+              ProbabilityGauge(model.successPercentageRounded),
             ],
           );
         },
