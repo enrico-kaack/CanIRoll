@@ -13,7 +13,7 @@ class ProbabilityGauge extends StatelessWidget {
       width: double.infinity,
       child: CustomPaint(
         painter: ProbabilityGaugePainter(probability),
-        willChange: true,
+        willChange: false,
       ),
     );
   }
