@@ -14,11 +14,9 @@ class StateModel extends ChangeNotifier {
   String get presetName => _presetName;
 
   final List<Dice> _dices = [];
-  final List<Dice> _presetDices = [];
   final List<Preset> _presets = [];
 
   List<Dice> get dices => _dices;
-  List<Dice> get presetDices => _presetDices;
   List<Preset> get presets => _presets;
 
   double succesRate = 0.0;
@@ -86,12 +84,6 @@ class StateModel extends ChangeNotifier {
     refreshSuccessRate();
   }
 
-
-  void setPresetModifier(int presetModifier){
-    _presetModifier = presetModifier;
-    notifyListeners();
-  }
-
   void setPreset(String presetName){
     _presetName = presetName;
     notifyListeners();
@@ -112,32 +104,15 @@ class StateModel extends ChangeNotifier {
     refreshSuccessRate();
   }
 
-  void addPresetDice(int diceNumber) {
-    //enforces dice limitation due to performance
-    if (_presetDices.isNotEmpty &&
-        _presetDices
-            .map((e) => e.value)
-            .reduce((value, element) => value * element) >=
-            10e4) {
-      return;
-    }
 
-    _presetDices.add(Dice(diceNumber));
-    notifyListeners();
-  }
-
-  void addPreset(String name, int modifier, List<Dice> dice){
-    _presets.add(Preset(name, modifier, dice));
+  void addPreset(){
+    _presets.add(Preset("Preset", modifier, dices));
     notifyListeners();
   }
 
   void deleteDice(String uuid) {
     _dices.removeWhere((element) => element.id == uuid);
     refreshSuccessRate();
-  }
-
-  void deletePresetDice(String uuid) {
-    _presetDices.removeWhere((element) => element.id == uuid);
   }
 
   void reset() {
