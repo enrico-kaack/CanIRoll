@@ -106,12 +106,12 @@ class ProbabilityGaugePainter extends CustomPainter {
     var majorTickPaint = Paint();
     majorTickPaint.style = PaintingStyle.stroke;
     majorTickPaint.color = const Color.fromARGB(255, 93, 93, 93);
-    majorTickPaint.strokeWidth = 4;
+    majorTickPaint.strokeWidth = 2;
 
     var minorTickPaint = Paint();
     minorTickPaint.style = PaintingStyle.stroke;
     minorTickPaint.color = const Color.fromARGB(255, 93, 93, 93);
-    minorTickPaint.strokeWidth = 3;
+    minorTickPaint.strokeWidth = 1;
 
     const textStyle = TextStyle(
       color: Colors.black,
