@@ -1,4 +1,5 @@
 import 'package:caniroll/state.dart';
+import 'package:caniroll/widget/dice_button.dart';
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:provider/provider.dart';
@@ -79,18 +80,9 @@ class HomePage extends StatelessWidget {
               ),
               Row(
                 children: [
-                  OutlinedButton(
-                    onPressed: () => model.addDice(4),
-                    child: const Text("d4"),
-                  ),
-                  OutlinedButton(
-                    onPressed: () => model.addDice(6),
-                    child: const Text("d6"),
-                  ),
-                  OutlinedButton(
-                    onPressed: () => model.addDice(8),
-                    child: const Text("d8"),
-                  ),
+                  DiceButton(() => model.addDice(4), 4),
+                  DiceButton(() => model.addDice(6), 6),
+                  DiceButton(() => model.addDice(8), 8),
                   OutlinedButton(
                     onPressed: () => model.addDice(10),
                     child: const Text("d10"),
