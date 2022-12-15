@@ -1,5 +1,6 @@
 import 'package:caniroll/probability_gauge.dart';
 import 'package:caniroll/state.dart';
+import 'package:caniroll/widget/dice_button.dart';
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:provider/provider.dart';
@@ -48,9 +49,8 @@ class HomePage extends StatelessWidget {
         builder: (context, model, child) {
           List<Widget> dices = [];
           for (var d in model.dices) {
-            dices.add(OutlinedButton(
-                onPressed: () => model.deleteDice(d.id),
-                child: Text("d${d.value}")));
+            dices.add(
+                DiceButton(() => model.deleteDice(d.id), d.value, Colors.blue));
           }
           return Column(
             children: <Widget>[
@@ -69,42 +69,33 @@ class HomePage extends StatelessWidget {
                 value: model.modifier,
                 textMapper: (v) => double.parse(v) >= 0 ? "+" + v : v,
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxHeight: 60,
+                  ),
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: dices,
+                  ),
+                ),
+              ),
               ConstrainedBox(
                 constraints: const BoxConstraints(
-                  maxHeight: 40,
+                  maxHeight: 65,
                 ),
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children: dices,
+                  children: [
+                    DiceButton(() => model.addDice(4), 4, Colors.black),
+                    DiceButton(() => model.addDice(6), 6, Colors.black),
+                    DiceButton(() => model.addDice(8), 8, Colors.black),
+                    DiceButton(() => model.addDice(10), 10, Colors.black),
+                    DiceButton(() => model.addDice(12), 12, Colors.black),
+                    DiceButton(() => model.addDice(20), 20, Colors.black),
+                  ],
                 ),
-              ),
-              Row(
-                children: [
-                  OutlinedButton(
-                    onPressed: () => model.addDice(4),
-                    child: const Text("d4"),
-                  ),
-                  OutlinedButton(
-                    onPressed: () => model.addDice(6),
-                    child: const Text("d6"),
-                  ),
-                  OutlinedButton(
-                    onPressed: () => model.addDice(8),
-                    child: const Text("d8"),
-                  ),
-                  OutlinedButton(
-                    onPressed: () => model.addDice(10),
-                    child: const Text("d10"),
-                  ),
-                  OutlinedButton(
-                    onPressed: () => model.addDice(12),
-                    child: const Text("d12"),
-                  ),
-                  OutlinedButton(
-                    onPressed: () => model.addDice(20),
-                    child: const Text("d20"),
-                  )
-                ],
               ),
               ProbabilityGauge(model.successPercentageRounded),
             ],
