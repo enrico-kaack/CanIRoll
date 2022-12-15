@@ -48,9 +48,8 @@ class HomePage extends StatelessWidget {
         builder: (context, model, child) {
           List<Widget> dices = [];
           for (var d in model.dices) {
-            dices.add(OutlinedButton(
-                onPressed: () => model.deleteDice(d.id),
-                child: Text("d${d.value}")));
+            dices.add(
+                DiceButton(() => model.deleteDice(d.id), d.value, Colors.blue));
           }
           return Column(
             children: <Widget>[
@@ -69,23 +68,26 @@ class HomePage extends StatelessWidget {
                 value: model.modifier,
                 textMapper: (v) => double.parse(v) >= 0 ? "+" + v : v,
               ),
-              ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxHeight: 40,
-                ),
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: dices,
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxHeight: 60,
+                  ),
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: dices,
+                  ),
                 ),
               ),
               Row(
                 children: [
-                  DiceButton(() => model.addDice(4), 4),
-                  DiceButton(() => model.addDice(6), 6),
-                  DiceButton(() => model.addDice(8), 8),
-                  DiceButton(() => model.addDice(10), 10),
-                  DiceButton(() => model.addDice(12), 12),
-                  DiceButton(() => model.addDice(20), 20),
+                  DiceButton(() => model.addDice(4), 4, Colors.black),
+                  DiceButton(() => model.addDice(6), 6, Colors.black),
+                  DiceButton(() => model.addDice(8), 8, Colors.black),
+                  DiceButton(() => model.addDice(10), 10, Colors.black),
+                  DiceButton(() => model.addDice(12), 12, Colors.black),
+                  DiceButton(() => model.addDice(20), 20, Colors.black),
                 ],
               ),
               const Text("Chances for success"),
