@@ -218,7 +218,7 @@ class CustomD12DicePainter extends CustomPainter {
       maxWidth: size.width,
     );
     final xCenter = (size.width - textPainter.width) / 2;
-    final yCenter = (size.height - textPainter.height) * 0.45;
+    final yCenter = (size.height - textPainter.height) * 0.47;
     final offset = Offset(xCenter, yCenter);
     textPainter.paint(canvas, offset);
   }
@@ -291,7 +291,7 @@ class CustomD10DicePainter extends CustomPainter {
       fontSize: 12,
     );
     final textSpan = TextSpan(
-      text: '0',
+      text: '10',
       style: textStyle,
     );
     final textPainter = TextPainter(
