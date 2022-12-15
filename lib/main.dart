@@ -69,7 +69,7 @@ class HomePage extends StatelessWidget {
                 textMapper: (v) => double.parse(v) >= 0 ? "+" + v : v,
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
                     maxHeight: 60,
@@ -80,15 +80,21 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
               ),
-              Row(
-                children: [
-                  DiceButton(() => model.addDice(4), 4, Colors.black),
-                  DiceButton(() => model.addDice(6), 6, Colors.black),
-                  DiceButton(() => model.addDice(8), 8, Colors.black),
-                  DiceButton(() => model.addDice(10), 10, Colors.black),
-                  DiceButton(() => model.addDice(12), 12, Colors.black),
-                  DiceButton(() => model.addDice(20), 20, Colors.black),
-                ],
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxHeight: 65,
+                ),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    DiceButton(() => model.addDice(4), 4, Colors.black),
+                    DiceButton(() => model.addDice(6), 6, Colors.black),
+                    DiceButton(() => model.addDice(8), 8, Colors.black),
+                    DiceButton(() => model.addDice(10), 10, Colors.black),
+                    DiceButton(() => model.addDice(12), 12, Colors.black),
+                    DiceButton(() => model.addDice(20), 20, Colors.black),
+                  ],
+                ),
               ),
               const Text("Chances for success"),
               Text(model.successPercentageRounded.toString()),
