@@ -105,14 +105,25 @@ class StateModel extends ChangeNotifier {
   }
 
 
-  void addPreset(){
-    _presets.add(Preset("Preset", modifier, dices));
+
+  void addPreset(String name){
+    List<int> values = [];
+    for (var d in dices) {
+      values.add(d.value);
+    }
+
+    _presets.add(Preset(name, modifier, values));
     notifyListeners();
   }
 
   void deleteDice(String uuid) {
     _dices.removeWhere((element) => element.id == uuid);
     refreshSuccessRate();
+  }
+
+  void deletePreset(String uuid) {
+    _presets.removeWhere((element) => element.id == uuid);
+    notifyListeners();
   }
 
   void reset() {

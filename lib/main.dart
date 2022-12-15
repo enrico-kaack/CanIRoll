@@ -41,8 +41,22 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () => {
-                    Provider.of<StateModel>(context, listen: false).addPreset(),
-                  },
+                showDialog(context: context, builder: (_) =>
+                    SimpleDialog(
+                      title: Text("Preset Name"),
+                      children: [
+                        TextField(
+                          onSubmitted: (value) {Provider.of<StateModel>(context, listen: false).addPreset(value);},
+                          controller: null,
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () => {Navigator.pop(_)},
+                          child: const Text("Ok"),
+                        )
+                      ],
+                    ),
+                ),
+              },
                   icon: Icon(Icons.add)
                 ),
           IconButton(
@@ -61,20 +75,24 @@ class HomePage extends StatelessWidget {
                 onPressed: () => model.deleteDice(d.id),
                 child: Text("d${d.value}")));
           }
-          for (var d in model.presets) {
+          for (var p in model.presets) {
             presets.add(OutlinedButton(
                 onPressed: () =>
                 {
-                  model.setModifier(d.modifier),
-                  for (var e in d.dice) {
-                    dices.add(OutlinedButton(
-                        onPressed: () => model.deleteDice(e.id),
-                        child: Text("d${e.value}"))),
-                  },
+                  model.setModifier(p.modifier),
+                    for (var e in p.dices) {
+                      model.addDice(e),
+                      for (var d in model.dices) {
+                        dices.add(OutlinedButton(
+                            onPressed: () => model.deleteDice(d.id),
+                            child: Text("d${d.value}"))),
+                      },
+                    },
                 },
-                child: Text(d.name)));
+                onLongPress: () => model.deletePreset(p.id),
+                child: Text(p.name)));
           }
-            return Column(
+          return Column(
               children: <Widget>[
                 NumberSwitchWidget(
                   text: "Target",
