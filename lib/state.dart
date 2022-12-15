@@ -98,7 +98,6 @@ class StateModel extends ChangeNotifier {
   }
 
   void reset() {
-    _target = 10;
     _modifier = 0;
     _dices.clear();
     refreshSuccessRate();
