@@ -85,10 +85,7 @@ class HomePage extends StatelessWidget {
                   DiceButton(() => model.addDice(8), 8),
                   DiceButton(() => model.addDice(10), 10),
                   DiceButton(() => model.addDice(12), 12),
-                  OutlinedButton(
-                    onPressed: () => model.addDice(20),
-                    child: const Text("d20"),
-                  )
+                  DiceButton(() => model.addDice(20), 20),
                 ],
               ),
               const Text("Chances for success"),
