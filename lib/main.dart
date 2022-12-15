@@ -41,24 +41,11 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () => {
-                showDialog(context: context, builder: (_) =>
-                    SimpleDialog(
-                      title: Text("Preset Name"),
-                      children: [
-                        TextField(
-                          onSubmitted: (value) {Provider.of<StateModel>(context, listen: false).addPreset(value);},
-                          controller: null,
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () => {Navigator.pop(_)},
-                          child: const Text("Ok"),
-                        )
-                      ],
-                    ),
-                ),
+                Provider.of<StateModel>(context, listen: false).setPreset(),
+                Provider.of<StateModel>(context, listen: false).addPreset(),
               },
-                  icon: Icon(Icons.add)
-                ),
+              icon: Icon(Icons.add)
+          ),
           IconButton(
             onPressed: () =>
                 Provider.of<StateModel>(context, listen: false).reset(),
@@ -79,6 +66,7 @@ class HomePage extends StatelessWidget {
             presets.add(OutlinedButton(
                 onPressed: () =>
                 {
+                  model.reset(),
                   model.setModifier(p.modifier),
                     for (var e in p.dices) {
                       model.addDice(e),

@@ -84,8 +84,13 @@ class StateModel extends ChangeNotifier {
     refreshSuccessRate();
   }
 
-  void setPreset(String presetName){
-    _presetName = presetName;
+  void setPreset(){
+    String defaultName = "";
+    for (var d in dices) {
+      defaultName = "${defaultName}d${d.value}+";
+    }
+    defaultName = "$defaultName${modifier}";
+    _presetName = defaultName;
     notifyListeners();
   }
 
@@ -106,13 +111,13 @@ class StateModel extends ChangeNotifier {
 
 
 
-  void addPreset(String name){
+  void addPreset(){
     List<int> values = [];
     for (var d in dices) {
       values.add(d.value);
     }
 
-    _presets.add(Preset(name, modifier, values));
+    _presets.add(Preset(presetName, modifier, values));
     notifyListeners();
   }
 
