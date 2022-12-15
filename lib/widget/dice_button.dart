@@ -29,8 +29,98 @@ CustomPainter? getPainterForDiceNumber(int diceNumber) {
       return CustomD8DicePainter();
     case 10:
       return CustomD10DicePainter();
+    case 12:
+      return CustomD12DicePainter();
     default:
       return null;
+  }
+}
+
+class CustomD12DicePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint();
+    paint.style = PaintingStyle.stroke;
+    paint.strokeWidth = 3;
+    paint.strokeJoin = StrokeJoin.round;
+
+    //inner figure, starting top going clockwise
+    List<List<double>> innerPoints = [
+      [size.width * 0.5, size.height * 0.3],
+      [size.width * 0.7, size.height * 0.45],
+      [size.width * 0.6, size.height * 0.65],
+      [size.width * 0.4, size.height * 0.65],
+      [size.width * 0.3, size.height * 0.45],
+    ];
+
+    var linePath = Path();
+    linePath.moveTo(innerPoints[0][0], innerPoints[0][1]);
+    for (var p in innerPoints) {
+      linePath.lineTo(p[0], p[1]);
+    }
+    linePath.close();
+    canvas.drawPath(linePath, paint);
+
+    //outer points, starting top going clockwise
+    List<List<double>> outerPoints = [
+      [size.width * 0.5, size.height * 0.05],
+      [size.width * 0.75, size.height * 0.15],
+      [size.width * 0.9, size.height * 0.4],
+      [size.width * 0.91, size.height * 0.6],
+      [size.width * 0.75, size.height * 0.85],
+      [size.width * 0.5, size.height * 0.95],
+      [size.width * 0.25, size.height * 0.85],
+      [size.width * 0.09, size.height * 0.6],
+      [size.width * 0.1, size.height * 0.4],
+      [size.width * 0.25, size.height * 0.15],
+    ];
+    linePath = Path();
+    linePath.moveTo(outerPoints[0][0], outerPoints[0][1]);
+    for (var p in outerPoints) {
+      linePath.lineTo(p[0], p[1]);
+    }
+    linePath.close();
+    canvas.drawPath(linePath, paint);
+
+    linePath = Path();
+    linePath.moveTo(innerPoints[0][0], innerPoints[0][1]);
+    linePath.lineTo(outerPoints[0][0], outerPoints[0][1]);
+    linePath.moveTo(innerPoints[1][0], innerPoints[1][1]);
+    linePath.lineTo(outerPoints[2][0], outerPoints[2][1]);
+    linePath.moveTo(innerPoints[2][0], innerPoints[2][1]);
+    linePath.lineTo(outerPoints[4][0], outerPoints[4][1]);
+    linePath.moveTo(innerPoints[3][0], innerPoints[3][1]);
+    linePath.lineTo(outerPoints[6][0], outerPoints[6][1]);
+    linePath.moveTo(innerPoints[4][0], innerPoints[4][1]);
+    linePath.lineTo(outerPoints[8][0], outerPoints[8][1]);
+
+    canvas.drawPath(linePath, paint);
+
+    final textStyle = TextStyle(
+      color: Colors.black,
+      fontSize: 12,
+    );
+    final textSpan = TextSpan(
+      text: '12',
+      style: textStyle,
+    );
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout(
+      minWidth: 0,
+      maxWidth: size.width,
+    );
+    final xCenter = (size.width - textPainter.width) / 2;
+    final yCenter = (size.height - textPainter.height) * 0.45;
+    final offset = Offset(xCenter, yCenter);
+    textPainter.paint(canvas, offset);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
   }
 }
 
