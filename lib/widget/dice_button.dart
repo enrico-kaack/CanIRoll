@@ -48,10 +48,10 @@ class CustomD20DicePainter extends CustomPainter {
 
     //inner figure, starting top left going clockwise
     List<List<double>> innerPoints = [
-      [size.width * 0.25, size.height * 0.4],
-      [size.width * 0.75, size.height * 0.4],
-      [size.width * 0.5, size.height * 0.8],
-    ];
+      [0.25, 0.4],
+      [0.75, 0.4],
+      [0.5, 0.8],
+    ].map((e) => [e[0] * size.width, e[1] * size.height]).toList();
 
     var linePath = Path();
     linePath.moveTo(innerPoints[0][0], innerPoints[0][1]);
@@ -63,13 +63,13 @@ class CustomD20DicePainter extends CustomPainter {
 
     //outer points, starting top going clockwise
     List<List<double>> outerPoints = [
-      [size.width * 0.5, size.height * 0.0],
-      [size.width * 1, size.height * 0.25],
-      [size.width * 1, size.height * 0.75],
-      [size.width * 0.5, size.height * 1],
-      [size.width * 0, size.height * 0.75],
-      [size.width * 0.0, size.height * 0.25],
-    ];
+      [0.5, 0.0],
+      [1, 0.25],
+      [1, 0.75],
+      [0.5, 1],
+      [0, 0.75],
+      [0.0, 0.25],
+    ].map((e) => [e[0] * size.width, e[1] * size.height]).toList();
     linePath = Path();
     linePath.moveTo(outerPoints[0][0], outerPoints[0][1]);
     for (var p in outerPoints) {
@@ -102,11 +102,11 @@ class CustomD20DicePainter extends CustomPainter {
 
     canvas.drawPath(linePath, paint);
 
-    final textStyle = TextStyle(
+    const textStyle = TextStyle(
       color: Colors.black,
       fontSize: 12,
     );
-    final textSpan = TextSpan(
+    const textSpan = TextSpan(
       text: '20',
       style: textStyle,
     );
@@ -140,12 +140,12 @@ class CustomD12DicePainter extends CustomPainter {
 
     //inner figure, starting top going clockwise
     List<List<double>> innerPoints = [
-      [size.width * 0.5, size.height * 0.3],
-      [size.width * 0.7, size.height * 0.45],
-      [size.width * 0.6, size.height * 0.65],
-      [size.width * 0.4, size.height * 0.65],
-      [size.width * 0.3, size.height * 0.45],
-    ];
+      [0.5, 0.3],
+      [0.7, 0.45],
+      [0.6, 0.65],
+      [0.4, 0.65],
+      [0.3, 0.45],
+    ].map((e) => [e[0] * size.width, e[1] * size.height]).toList();
 
     var linePath = Path();
     linePath.moveTo(innerPoints[0][0], innerPoints[0][1]);
@@ -157,17 +157,17 @@ class CustomD12DicePainter extends CustomPainter {
 
     //outer points, starting top going clockwise
     List<List<double>> outerPoints = [
-      [size.width * 0.5, size.height * 0.05],
-      [size.width * 0.75, size.height * 0.15],
-      [size.width * 0.9, size.height * 0.4],
-      [size.width * 0.91, size.height * 0.6],
-      [size.width * 0.75, size.height * 0.85],
-      [size.width * 0.5, size.height * 0.95],
-      [size.width * 0.25, size.height * 0.85],
-      [size.width * 0.09, size.height * 0.6],
-      [size.width * 0.1, size.height * 0.4],
-      [size.width * 0.25, size.height * 0.15],
-    ];
+      [0.5, 0.05],
+      [0.75, 0.15],
+      [0.9, 0.4],
+      [0.91, 0.6],
+      [0.75, 0.85],
+      [0.5, 0.95],
+      [0.25, 0.85],
+      [0.09, 0.6],
+      [0.1, 0.4],
+      [0.25, 0.15],
+    ].map((e) => [e[0] * size.width, e[1] * size.height]).toList();
     linePath = Path();
     linePath.moveTo(outerPoints[0][0], outerPoints[0][1]);
     for (var p in outerPoints) {
@@ -190,11 +190,11 @@ class CustomD12DicePainter extends CustomPainter {
 
     canvas.drawPath(linePath, paint);
 
-    final textStyle = TextStyle(
+    const textStyle = TextStyle(
       color: Colors.black,
       fontSize: 12,
     );
-    final textSpan = TextSpan(
+    const textSpan = TextSpan(
       text: '12',
       style: textStyle,
     );
@@ -226,66 +226,55 @@ class CustomD10DicePainter extends CustomPainter {
     paint.strokeWidth = 3;
     paint.strokeJoin = StrokeJoin.round;
 
-    //inner figure
-    var topX = size.width / 2;
-    var topY = 10.0;
-    var rightX = size.width - (size.width / 3);
-    var rightY = (size.height / 10) * 4.5;
-    var bottomX = topX;
-    var bottomY = (size.height / 10) * 6.0;
-    var leftX = (size.width / 3);
-    var leftY = rightY;
+    //inner figure, starting top, going clockwise
+    List<List<double>> innerPoints = [
+      [0.5, 0],
+      [0.7, 0.5],
+      [0.5, 0.65],
+      [0.3, 0.5],
+    ].map((e) => [e[0] * size.width, e[1] * size.height]).toList();
 
-    //outer points
-    var outRightX = size.width - 10;
-    var outRightY = (size.height / 10) * 5;
-    var outBottomX = topX;
-    var outBottomY = size.height - topY;
-    var outLeftX = 10.0;
-    var outLeftY = outRightY;
-
-    //draw inner figure
     var linePath = Path();
-    linePath.moveTo(topX, topY);
-    linePath.lineTo(rightX, rightY);
-    linePath.lineTo(bottomX, bottomY);
-    linePath.lineTo(leftX, leftY);
+    linePath.moveTo(innerPoints[0][0], innerPoints[0][1]);
+    for (var p in innerPoints) {
+      linePath.lineTo(p[0], p[1]);
+    }
+    linePath.close();
+    canvas.drawPath(linePath, paint);
+
+    //outer points, starting top, going clockwise
+    List<List<double>> outerPoints = [
+      [0.5, 0.0],
+      [1.0, 0.6],
+      [0.5, 1.0],
+      [0.0, 0.6],
+    ].map((e) => [e[0] * size.width, e[1] * size.height]).toList();
+    linePath = Path();
+    linePath.moveTo(outerPoints[0][0], outerPoints[0][1]);
+    for (var p in outerPoints) {
+      linePath.lineTo(p[0], p[1]);
+    }
     linePath.close();
     canvas.drawPath(linePath, paint);
 
     //3 attaching traingles for 3d effect
     var linePath3D = Path();
-    linePath3D.moveTo(rightX, rightY);
-    linePath3D.lineTo(outRightX, outRightY);
-    linePath3D.lineTo(topX, topY);
-    linePath3D.close();
+    linePath3D.moveTo(innerPoints[1][0], innerPoints[1][1]);
+    linePath3D.lineTo(outerPoints[1][0], outerPoints[1][1]);
+
+    linePath3D.moveTo(innerPoints[2][0], innerPoints[2][1]);
+    linePath3D.lineTo(outerPoints[2][0], outerPoints[2][1]);
+
+    linePath3D.moveTo(innerPoints[3][0], innerPoints[3][1]);
+    linePath3D.lineTo(outerPoints[3][0], outerPoints[3][1]);
+
     canvas.drawPath(linePath3D, paint);
 
-    linePath3D.moveTo(bottomX, bottomY);
-    linePath3D.lineTo(outBottomX, outBottomY);
-    linePath3D.lineTo(outRightX, outRightY);
-    linePath3D.lineTo(rightX, rightY);
-    linePath3D.close();
-    canvas.drawPath(linePath3D, paint);
-
-    linePath3D.moveTo(bottomX, bottomY);
-    linePath3D.lineTo(outBottomX, outBottomY);
-    linePath3D.lineTo(outLeftX, outLeftY);
-    linePath3D.lineTo(leftX, leftY);
-    linePath3D.close();
-    canvas.drawPath(linePath3D, paint);
-
-    linePath3D.moveTo(leftX, leftY);
-    linePath3D.lineTo(outLeftX, outLeftY);
-    linePath3D.lineTo(topX, topY);
-    linePath3D.close();
-    canvas.drawPath(linePath3D, paint);
-
-    final textStyle = TextStyle(
+    const textStyle = TextStyle(
       color: Colors.black,
       fontSize: 12,
     );
-    final textSpan = TextSpan(
+    const textSpan = TextSpan(
       text: '0',
       style: textStyle,
     );
@@ -317,40 +306,44 @@ class CustomD8DicePainter extends CustomPainter {
     paint.strokeWidth = 3;
     paint.strokeJoin = StrokeJoin.round;
 
-    //base triangle
+    //inner figure, starting top, going clockwise
+    List<List<double>> innerPoints = [
+      [0.5, 0],
+      [1, 0.7],
+      [0, 0.7],
+    ].map((e) => [e[0] * size.width, e[1] * size.height]).toList();
+
     var linePath = Path();
-    linePath.moveTo(size.width / 2, 10);
-    linePath.lineTo(10, size.height - 20);
-    linePath.lineTo(size.width - 10, size.height - 20);
-    linePath.lineTo(size.width / 2, 10);
+    linePath.moveTo(innerPoints[0][0], innerPoints[0][1]);
+    for (var p in innerPoints) {
+      linePath.lineTo(p[0], p[1]);
+    }
     linePath.close();
     canvas.drawPath(linePath, paint);
 
-    //3 attaching traingles for 3d effect
-    var linePath3D = Path();
-    linePath3D.moveTo(size.width / 2, 10);
-    linePath3D.lineTo(size.width - 7, size.height / 2 - 5);
-    linePath3D.lineTo(size.width - 10, size.height - 20);
-    linePath3D.close();
-    canvas.drawPath(linePath3D, paint);
+    //outer points, starting top, going clockwise
+    List<List<double>> outerPoints = [
+      [0.5, 0.0],
+      [1.0, 0.3],
+      [1.0, 0.7],
+      [0.5, 1.0],
+      [0, 0.7],
+      [0, 0.3],
+      [0.5, 0]
+    ].map((e) => [e[0] * size.width, e[1] * size.height]).toList();
+    linePath = Path();
+    linePath.moveTo(outerPoints[0][0], outerPoints[0][1]);
+    for (var p in outerPoints) {
+      linePath.lineTo(p[0], p[1]);
+    }
+    linePath.close();
+    canvas.drawPath(linePath, paint);
 
-    linePath3D.moveTo(size.width - 10, size.height - 20);
-    linePath3D.lineTo(size.width / 2, size.height - 10);
-    linePath3D.lineTo(10, size.height - 20);
-    linePath3D.close();
-    canvas.drawPath(linePath3D, paint);
-
-    linePath3D.moveTo(10, size.height - 20);
-    linePath3D.lineTo(7, size.height / 2 - 5);
-    linePath3D.lineTo(size.width / 2, 10);
-    linePath3D.close();
-    canvas.drawPath(linePath3D, paint);
-
-    final textStyle = TextStyle(
+    const textStyle = TextStyle(
       color: Colors.black,
       fontSize: 24,
     );
-    final textSpan = TextSpan(
+    const textSpan = TextSpan(
       text: '8',
       style: textStyle,
     );
@@ -363,8 +356,8 @@ class CustomD8DicePainter extends CustomPainter {
       maxWidth: size.width,
     );
     final xCenter = (size.width - textPainter.width) / 2;
-    final yCenter = (size.height - textPainter.height) / 2;
-    final offset = Offset(xCenter, yCenter - 1);
+    final yCenter = (size.height - textPainter.height) * 0.4;
+    final offset = Offset(xCenter, yCenter);
     textPainter.paint(canvas, offset);
   }
 
@@ -382,20 +375,25 @@ class CustomD4DicePainter extends CustomPainter {
     paint.strokeWidth = 3;
     paint.strokeJoin = StrokeJoin.miter;
 
-    var linePath = Path();
-    linePath.moveTo(size.width / 2, 10);
-    linePath.lineTo(10, size.height - 10);
-    linePath.lineTo(size.width - 10, size.height - 10);
-    linePath.lineTo(size.width / 2, 10);
-    linePath.close();
+    List<List<double>> innerPoints = [
+      [0.5, 0.1],
+      [1, 0.9],
+      [0, 0.9],
+    ].map((e) => [e[0] * size.width, e[1] * size.height]).toList();
 
+    var linePath = Path();
+    linePath.moveTo(innerPoints[0][0], innerPoints[0][1]);
+    for (var p in innerPoints) {
+      linePath.lineTo(p[0], p[1]);
+    }
+    linePath.close();
     canvas.drawPath(linePath, paint);
 
-    final textStyle = TextStyle(
+    const textStyle = TextStyle(
       color: Colors.black,
       fontSize: 24,
     );
-    final textSpan = TextSpan(
+    const textSpan = TextSpan(
       text: '4',
       style: textStyle,
     );
@@ -425,14 +423,14 @@ class CustomD6DicePainter extends CustomPainter {
     var paint = Paint();
     paint.style = PaintingStyle.stroke;
     paint.strokeWidth = 3;
-    var rect = Rect.fromLTRB(10, 10, size.width - 10, size.height - 10);
+    var rect = Rect.fromLTRB(0, 0, size.width, size.height);
     canvas.drawRect(rect, paint);
 
-    final textStyle = TextStyle(
+    const textStyle = TextStyle(
       color: Colors.black,
       fontSize: 28,
     );
-    final textSpan = TextSpan(
+    const textSpan = TextSpan(
       text: '6',
       style: textStyle,
     );
