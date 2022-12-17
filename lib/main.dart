@@ -129,15 +129,22 @@ class DiceWithSuccessRatePrediction extends StatelessWidget {
       children: [
         DiceButton(function, diceValue, Colors.black),
         Container(
-          child: successRate.isFinite && successRate > 0.0
-              ? Text(
-                  (successRate * 100).toStringAsPrecision(3),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )
-              : null,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            color: ThemeData.light().backgroundColor,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(3.0),
+            child: successRate.isFinite && successRate > 0.0
+                ? Text(
+                    (successRate * 100).toStringAsPrecision(3),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
+          ),
         )
       ],
     );
