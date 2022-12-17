@@ -2,21 +2,6 @@ import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 
-class SuccesRateSimulatorInput {
-  int additionalDice;
-  List<List<int>> existingPermutations;
-  int target;
-  int modifier;
-
-  SuccesRateSimulatorInput(this.additionalDice, this.existingPermutations,
-      this.target, this.modifier);
-}
-
-Future<double> asyncSuccessRateSimulation(SuccesRateSimulatorInput data) async {
-  return compute<SuccesRateSimulatorInput, double>(
-      simulateSuccessRateWithAdditionalDice, data);
-}
-
 class SuccessRateCalculationInput {
   List<int> dices;
   int target;
@@ -32,6 +17,8 @@ class SuccessRateCalculator {
 
   Future<Stream> runSuccessRateCalculationAndSimulation(
       List<int> dices, int target, int modifier) async {
+    assert(dices.isNotEmpty);
+
     //kill existing calculation
     if (isolate != null) {
       isolate!.kill(priority: Isolate.immediate);
@@ -50,69 +37,50 @@ class SuccessRateCalculator {
 void isolateCalcSuccessRateAndSimulate(SuccessRateCalculationInput data) {
   int target = data.target - data.modifier;
 
-  var permutations = getRecursionPermutations(data.dices);
-  var matching = permutations
-      .map((e) => e.reduce((value, element) => value + element))
-      .where((element) => element >= target)
-      .length;
+  var permutationResponse = calcPermutationsForDices(data.dices, target);
+  var matching = permutationResponse.removedPermutations;
+  var allPermutationsCount = permutationResponse.permutations.length +
+      permutationResponse.removedPermutations;
 
-  var probability = matching / permutations.length;
+  var probability = matching / allPermutationsCount;
   data.sendPort.send({"successRate": probability});
 
   for (var d in [4, 6, 8, 10, 12, 20]) {
-    var input =
-        SuccesRateSimulatorInput(d, permutations, data.target, data.modifier);
-    var simulatedSuccessRate = simulateSuccessRateWithAdditionalDice(input);
-    data.sendPort.send({d.toString(): simulatedSuccessRate});
+    var res = calcPermutationsForDices([d], target,
+        permutations: permutationResponse.permutations,
+        removedPermutations: permutationResponse.removedPermutations);
+    data.sendPort.send({
+      d.toString(): res.removedPermutations /
+          (res.permutations.length + res.removedPermutations)
+    });
   }
 }
 
-List<List<int>> getRecursionPermutations(List<int> dices) {
-  List<List<int>> possibilities = [];
-  if (dices.length == 1) {
-    for (var i = 1; i <= dices.first; i++) {
-      possibilities.add([i]);
+PermutationWithRemovedPermutations calcPermutationsForDices(
+    List<int> dices, int normalisedTarget,
+    {List<int> permutations = const [0], int removedPermutations = 0}) {
+  for (var d in dices) {
+    removedPermutations = removedPermutations * d;
+    List<int> newPermutations = [];
+    for (var p in permutations) {
+      for (var val = 1; val <= d; val++) {
+        var newPermutationValue = p + val;
+        //dont add this permutation if it already fullfill the target
+        if (newPermutationValue >= normalisedTarget) {
+          removedPermutations++;
+        } else {
+          newPermutations.add(newPermutationValue);
+        }
+      }
     }
-    return possibilities;
+    permutations = newPermutations;
   }
-
-  var listForRecursion = dices.sublist(1);
-  var otherPosibilities = getRecursionPermutations(listForRecursion);
-  for (var i = 1; i <= dices.first; i++) {
-    List<List<int>> newComibnations = [];
-    for (var others in otherPosibilities) {
-      var newCombination = [...others];
-      newCombination.add(i);
-      newComibnations.add(newCombination);
-    }
-    possibilities.addAll(newComibnations);
-  }
-  return possibilities;
+  return PermutationWithRemovedPermutations(permutations, removedPermutations);
 }
 
-double simulateSuccessRateWithAdditionalDice(SuccesRateSimulatorInput data) {
-  int target = data.target - data.modifier;
-
-  var permutations = simulateRecursionsWithAdditionalDice(
-      data.additionalDice, data.existingPermutations);
-  var matching = permutations
-      .map((e) => e.reduce((value, element) => value + element))
-      .where((element) => element >= target)
-      .length;
-  return matching / permutations.length;
-}
-
-List<List<int>> simulateRecursionsWithAdditionalDice(
-    int dice, List<List<int>> existingPermutations) {
-  List<List<int>> possibilities = [];
-  for (var i = 1; i <= dice; i++) {
-    List<List<int>> newComibnations = [];
-    for (var others in existingPermutations) {
-      var newCombination = [...others];
-      newCombination.add(i);
-      newComibnations.add(newCombination);
-    }
-    possibilities.addAll(newComibnations);
-  }
-  return possibilities;
+class PermutationWithRemovedPermutations {
+  List<int> permutations;
+  int removedPermutations;
+  PermutationWithRemovedPermutations(
+      this.permutations, this.removedPermutations);
 }

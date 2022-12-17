@@ -101,15 +101,6 @@ class StateModel extends ChangeNotifier {
   }
 
   void addDice(int diceNumber) {
-    //enforces dice limitation due to performance
-    if (_dices.isNotEmpty &&
-        _dices
-                .map((e) => e.value)
-                .reduce((value, element) => value * element) >=
-            10e4) {
-      return;
-    }
-
     _dices.add(Dice(diceNumber));
     notifyListeners();
     refreshSuccessRate();
