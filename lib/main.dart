@@ -1,5 +1,6 @@
 import 'package:caniroll/probability_gauge.dart';
 import 'package:caniroll/state.dart';
+import 'package:caniroll/success_rate_simulator.dart';
 import 'package:caniroll/widget/dice_button.dart';
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
@@ -52,6 +53,7 @@ class HomePage extends StatelessWidget {
             dices.add(
                 DiceButton(() => model.deleteDice(d.id), d.value, Colors.blue));
           }
+
           return Column(
             children: <Widget>[
               NumberSwitchWidget(
@@ -88,12 +90,18 @@ class HomePage extends StatelessWidget {
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: [
-                    DiceButton(() => model.addDice(4), 4, Colors.black),
-                    DiceButton(() => model.addDice(6), 6, Colors.black),
-                    DiceButton(() => model.addDice(8), 8, Colors.black),
-                    DiceButton(() => model.addDice(10), 10, Colors.black),
-                    DiceButton(() => model.addDice(12), 12, Colors.black),
-                    DiceButton(() => model.addDice(20), 20, Colors.black),
+                    DiceWithSuccessRatePrediction(
+                        4, () => model.addDice(4), model.successRateNextD4),
+                    DiceWithSuccessRatePrediction(
+                        6, () => model.addDice(6), model.successRateNextD6),
+                    DiceWithSuccessRatePrediction(
+                        8, () => model.addDice(8), model.successRateNextD8),
+                    DiceWithSuccessRatePrediction(
+                        10, () => model.addDice(10), model.successRateNextD10),
+                    DiceWithSuccessRatePrediction(
+                        12, () => model.addDice(12), model.successRateNextD12),
+                    DiceWithSuccessRatePrediction(
+                        20, () => model.addDice(20), model.successRateNextD20),
                   ],
                 ),
               ),
@@ -102,6 +110,43 @@ class HomePage extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class DiceWithSuccessRatePrediction extends StatelessWidget {
+  int diceValue;
+  double successRate;
+  Function() function;
+
+  DiceWithSuccessRatePrediction(
+      this.diceValue, this.function, this.successRate);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.bottomRight,
+      children: [
+        DiceButton(function, diceValue, Colors.black),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            color: ThemeData.light().backgroundColor,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(3.0),
+            child: successRate.isFinite && successRate > 0.0
+                ? Text(
+                    (successRate * 100).toStringAsPrecision(3),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
+          ),
+        )
+      ],
     );
   }
 }
