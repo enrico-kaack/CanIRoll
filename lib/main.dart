@@ -1,15 +1,26 @@
+import 'package:caniroll/peer_share_page.dart';
+import 'package:caniroll/peer_sharing/peer_share_state.dart';
 import 'package:caniroll/probability_gauge.dart';
 import 'package:caniroll/state.dart';
-import 'package:caniroll/success_rate_simulator.dart';
 import 'package:caniroll/widget/dice_button.dart';
+import 'package:caniroll/widget/dice_with_prediction.dart';
+import 'package:caniroll/widget/peer_result_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => StateModel(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<PeerShareStateModel>(
+          create: (_) => PeerShareStateModel(),
+        ),
+        ChangeNotifierProvider<StateModel>(
+          create: (context) => StateModel(
+              Provider.of<PeerShareStateModel>(context, listen: false)),
+        ),
+      ],
       child: const MyApp(),
     ),
   );
@@ -26,6 +37,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const HomePage(),
+      routes: {
+        "/main": (context) => HomePage(),
+        "/peershare": (context) => PeerSharePage(),
+      },
     );
   }
 }
@@ -39,6 +54,10 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Can I roll?"),
         actions: [
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, "/peershare"),
+            icon: Icon(Icons.sync),
+          ),
           IconButton(
             onPressed: () =>
                 Provider.of<StateModel>(context, listen: false).reset(),
@@ -106,47 +125,20 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               ProbabilityGauge(model.successPercentageRounded),
+              Consumer<PeerShareStateModel>(builder: (context, model, child) {
+                return Expanded(
+                  child: ListView(
+                    children: [
+                      ...model.peerData.entries.map((v) => PeerResultViewer(
+                          v.value.latestData, v.key, v.value.received)),
+                    ],
+                  ),
+                );
+              }),
             ],
           );
         },
       ),
-    );
-  }
-}
-
-class DiceWithSuccessRatePrediction extends StatelessWidget {
-  int diceValue;
-  double successRate;
-  Function() function;
-
-  DiceWithSuccessRatePrediction(
-      this.diceValue, this.function, this.successRate);
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.bottomRight,
-      children: [
-        DiceButton(function, diceValue, Colors.black),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-            color: ThemeData.light().backgroundColor,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(3.0),
-            child: successRate.isFinite && successRate > 0.0
-                ? Text(
-                    (successRate * 100).toStringAsPrecision(3),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                : null,
-          ),
-        )
-      ],
     );
   }
 }
