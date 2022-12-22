@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:caniroll/peer_sharing/dice_with_success_rate.dart';
-import 'package:caniroll/peer_sharing/peer_share.dart';
 
 class Server {
   bool isRunning = false;
@@ -21,7 +20,7 @@ class Server {
     peerListener = newPeerListener;
     this.getPeerList = getPeerList;
 
-    port = Random().nextInt(40000) + 10000;
+    port ??= Random().nextInt(40000) + 10000;
     var server = await HttpServer.bind(InternetAddress.anyIPv4, port!);
     print("Server running on IP : " +
         server.address.toString() +
@@ -65,7 +64,8 @@ class Server {
     } catch (e) {
       req.response
         ..statusCode = HttpStatus.internalServerError
-        ..write('Exception: $e.');
+        ..write('Exception: $e.')
+        ..close();
     }
   }
 
@@ -82,7 +82,8 @@ class Server {
     } catch (e) {
       req.response
         ..statusCode = HttpStatus.internalServerError
-        ..write('Exception: $e.');
+        ..write('Exception: $e.')
+        ..close();
     }
   }
 }
