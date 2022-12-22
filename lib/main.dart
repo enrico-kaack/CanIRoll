@@ -75,20 +75,25 @@ class HomePage extends StatelessWidget {
 
           return Column(
             children: <Widget>[
-              NumberSwitchWidget(
-                text: "Target",
-                min: 0,
-                max: 100,
-                value: model.target,
-                onChanged: (value) => model.setTarget(value),
-              ),
-              NumberSwitchWidget(
-                text: "Modifier",
-                onChanged: (value) => model.setModifier(value),
-                min: -100,
-                max: 100,
-                value: model.modifier,
-                textMapper: (v) => double.parse(v) >= 0 ? "+" + v : v,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  NumberSwitchWidget(
+                    text: "Target",
+                    min: 0,
+                    max: 100,
+                    value: model.target,
+                    onChanged: (value) => model.setTarget(value),
+                  ),
+                  NumberSwitchWidget(
+                    text: "Modifier",
+                    onChanged: (value) => model.setModifier(value),
+                    min: -100,
+                    max: 100,
+                    value: model.modifier,
+                    textMapper: (v) => double.parse(v) >= 0 ? "+" + v : v,
+                  ),
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -165,16 +170,23 @@ class NumberSwitchWidget extends StatelessWidget {
     return Card(
       child: Column(
         children: [
-          Text(text),
           NumberPicker(
-            itemHeight: 100.0,
-            axis: Axis.horizontal,
+            itemHeight: 50.0,
+            itemWidth: 150.0,
+            axis: Axis.vertical,
             minValue: min,
             maxValue: max,
             value: value,
             textMapper: textMapper,
             onChanged: onChanged,
+            haptics: true,
           ),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 18,
+            ),
+          )
         ],
       ),
     );
