@@ -1,4 +1,6 @@
 import 'package:caniroll/dice.dart';
+import 'package:caniroll/peer_sharing/dice_with_success_rate.dart';
+import 'package:caniroll/peer_sharing/peer_share_state.dart';
 import 'package:caniroll/success_rate_simulator.dart';
 import 'package:flutter/foundation.dart';
 
@@ -28,6 +30,10 @@ class StateModel extends ChangeNotifier {
 
   SuccessRateCalculator calculator = SuccessRateCalculator();
 
+  PeerShareStateModel _peerSharerStateModel;
+
+  StateModel(this._peerSharerStateModel);
+
   void refreshSuccessRate() async {
     successRateNextD4 = 0.0;
     successRateNextD6 = 0.0;
@@ -56,6 +62,8 @@ class StateModel extends ChangeNotifier {
         switch (typedElement.entries.first.key) {
           case "successRate":
             succesRate = typedElement.entries.first.value;
+            _peerSharerStateModel.broadcastData(
+                DiceWithSuccessRate(target, modifier, dices, succesRate));
             notifyListeners();
             break;
           case "4":

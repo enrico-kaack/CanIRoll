@@ -12,7 +12,7 @@ class DiceButton extends StatelessWidget {
     return RawMaterialButton(
       onPressed: onPressed,
       child: CustomPaint(
-        painter: getPainterForDiceNumber(diceNumber, color)!,
+        painter: getPainterForDiceNumber(diceNumber, color, true)!,
         size: const Size.square(60),
         willChange: false,
       ),
@@ -20,20 +20,21 @@ class DiceButton extends StatelessWidget {
   }
 }
 
-CustomPainter? getPainterForDiceNumber(int diceNumber, Color color) {
+CustomPainter? getPainterForDiceNumber(
+    int diceNumber, Color color, bool printNumber) {
   switch (diceNumber) {
     case 6:
-      return CustomD6DicePainter(color);
+      return CustomD6DicePainter(color, printNumber: printNumber);
     case 4:
-      return CustomD4DicePainter(color);
+      return CustomD4DicePainter(color, printNumber: printNumber);
     case 8:
-      return CustomD8DicePainter(color);
+      return CustomD8DicePainter(color, printNumber: printNumber);
     case 10:
-      return CustomD10DicePainter(color);
+      return CustomD10DicePainter(color, printNumber: printNumber);
     case 12:
-      return CustomD12DicePainter(color);
+      return CustomD12DicePainter(color, printNumber: printNumber);
     case 20:
-      return CustomD20DicePainter(color);
+      return CustomD20DicePainter(color, printNumber: printNumber);
     default:
       return null;
   }
@@ -41,8 +42,9 @@ CustomPainter? getPainterForDiceNumber(int diceNumber, Color color) {
 
 class CustomD20DicePainter extends CustomPainter {
   Color color;
+  bool printNumber;
 
-  CustomD20DicePainter(this.color);
+  CustomD20DicePainter(this.color, {this.printNumber = true});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -108,26 +110,28 @@ class CustomD20DicePainter extends CustomPainter {
 
     canvas.drawPath(linePath, paint);
 
-    final textStyle = TextStyle(
-      color: color,
-      fontSize: 12,
-    );
-    final textSpan = TextSpan(
-      text: '20',
-      style: textStyle,
-    );
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout(
-      minWidth: 0,
-      maxWidth: size.width,
-    );
-    final xCenter = (size.width - textPainter.width) / 2;
-    final yCenter = (size.height - textPainter.height) * 0.52;
-    final offset = Offset(xCenter, yCenter);
-    textPainter.paint(canvas, offset);
+    if (printNumber) {
+      final textStyle = TextStyle(
+        color: color,
+        fontSize: 12,
+      );
+      final textSpan = TextSpan(
+        text: '20',
+        style: textStyle,
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout(
+        minWidth: 0,
+        maxWidth: size.width,
+      );
+      final xCenter = (size.width - textPainter.width) / 2;
+      final yCenter = (size.height - textPainter.height) * 0.52;
+      final offset = Offset(xCenter, yCenter);
+      textPainter.paint(canvas, offset);
+    }
   }
 
   @override
@@ -138,8 +142,9 @@ class CustomD20DicePainter extends CustomPainter {
 
 class CustomD12DicePainter extends CustomPainter {
   Color color;
+  bool printNumber;
 
-  CustomD12DicePainter(this.color);
+  CustomD12DicePainter(this.color, {this.printNumber = true});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -201,26 +206,28 @@ class CustomD12DicePainter extends CustomPainter {
 
     canvas.drawPath(linePath, paint);
 
-    final textStyle = TextStyle(
-      color: color,
-      fontSize: 12,
-    );
-    final textSpan = TextSpan(
-      text: '12',
-      style: textStyle,
-    );
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout(
-      minWidth: 0,
-      maxWidth: size.width,
-    );
-    final xCenter = (size.width - textPainter.width) / 2;
-    final yCenter = (size.height - textPainter.height) * 0.47;
-    final offset = Offset(xCenter, yCenter);
-    textPainter.paint(canvas, offset);
+    if (printNumber) {
+      final textStyle = TextStyle(
+        color: color,
+        fontSize: 12,
+      );
+      final textSpan = TextSpan(
+        text: '12',
+        style: textStyle,
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout(
+        minWidth: 0,
+        maxWidth: size.width,
+      );
+      final xCenter = (size.width - textPainter.width) / 2;
+      final yCenter = (size.height - textPainter.height) * 0.47;
+      final offset = Offset(xCenter, yCenter);
+      textPainter.paint(canvas, offset);
+    }
   }
 
   @override
@@ -231,8 +238,9 @@ class CustomD12DicePainter extends CustomPainter {
 
 class CustomD10DicePainter extends CustomPainter {
   Color color;
+  bool printNumber;
 
-  CustomD10DicePainter(this.color);
+  CustomD10DicePainter(this.color, {this.printNumber = true});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -286,26 +294,28 @@ class CustomD10DicePainter extends CustomPainter {
 
     canvas.drawPath(linePath3D, paint);
 
-    final textStyle = TextStyle(
-      color: color,
-      fontSize: 12,
-    );
-    final textSpan = TextSpan(
-      text: '10',
-      style: textStyle,
-    );
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout(
-      minWidth: 0,
-      maxWidth: size.width,
-    );
-    final xCenter = (size.width - textPainter.width) / 2;
-    final yCenter = (size.height - textPainter.height) / 10 * 4.0;
-    final offset = Offset(xCenter, yCenter);
-    textPainter.paint(canvas, offset);
+    if (printNumber) {
+      final textStyle = TextStyle(
+        color: color,
+        fontSize: 12,
+      );
+      final textSpan = TextSpan(
+        text: '10',
+        style: textStyle,
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout(
+        minWidth: 0,
+        maxWidth: size.width,
+      );
+      final xCenter = (size.width - textPainter.width) / 2;
+      final yCenter = (size.height - textPainter.height) / 10 * 4.0;
+      final offset = Offset(xCenter, yCenter);
+      textPainter.paint(canvas, offset);
+    }
   }
 
   @override
@@ -316,8 +326,9 @@ class CustomD10DicePainter extends CustomPainter {
 
 class CustomD8DicePainter extends CustomPainter {
   Color color;
+  bool printNumber;
 
-  CustomD8DicePainter(this.color);
+  CustomD8DicePainter(this.color, {this.printNumber = true});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -360,26 +371,28 @@ class CustomD8DicePainter extends CustomPainter {
     linePath.close();
     canvas.drawPath(linePath, paint);
 
-    final textStyle = TextStyle(
-      color: color,
-      fontSize: 24,
-    );
-    final textSpan = TextSpan(
-      text: '8',
-      style: textStyle,
-    );
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout(
-      minWidth: 0,
-      maxWidth: size.width,
-    );
-    final xCenter = (size.width - textPainter.width) / 2;
-    final yCenter = (size.height - textPainter.height) * 0.4;
-    final offset = Offset(xCenter, yCenter);
-    textPainter.paint(canvas, offset);
+    if (printNumber) {
+      final textStyle = TextStyle(
+        color: color,
+        fontSize: 24,
+      );
+      final textSpan = TextSpan(
+        text: '8',
+        style: textStyle,
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout(
+        minWidth: 0,
+        maxWidth: size.width,
+      );
+      final xCenter = (size.width - textPainter.width) / 2;
+      final yCenter = (size.height - textPainter.height) * 0.4;
+      final offset = Offset(xCenter, yCenter);
+      textPainter.paint(canvas, offset);
+    }
   }
 
   @override
@@ -390,8 +403,9 @@ class CustomD8DicePainter extends CustomPainter {
 
 class CustomD6DicePainter extends CustomPainter {
   Color color;
+  bool printNumber;
 
-  CustomD6DicePainter(this.color);
+  CustomD6DicePainter(this.color, {this.printNumber = true});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -403,26 +417,28 @@ class CustomD6DicePainter extends CustomPainter {
     var rect = Rect.fromLTRB(0, 0, size.width, size.height);
     canvas.drawRect(rect, paint);
 
-    final textStyle = TextStyle(
-      color: color,
-      fontSize: 28,
-    );
-    final textSpan = TextSpan(
-      text: '6',
-      style: textStyle,
-    );
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout(
-      minWidth: 0,
-      maxWidth: size.width,
-    );
-    final xCenter = (size.width - textPainter.width) / 2;
-    final yCenter = (size.height - textPainter.height) / 2;
-    final offset = Offset(xCenter, yCenter);
-    textPainter.paint(canvas, offset);
+    if (printNumber) {
+      final textStyle = TextStyle(
+        color: color,
+        fontSize: 28,
+      );
+      final textSpan = TextSpan(
+        text: '6',
+        style: textStyle,
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout(
+        minWidth: 0,
+        maxWidth: size.width,
+      );
+      final xCenter = (size.width - textPainter.width) / 2;
+      final yCenter = (size.height - textPainter.height) / 2;
+      final offset = Offset(xCenter, yCenter);
+      textPainter.paint(canvas, offset);
+    }
   }
 
   @override
@@ -433,8 +449,9 @@ class CustomD6DicePainter extends CustomPainter {
 
 class CustomD4DicePainter extends CustomPainter {
   Color color;
+  bool printNumber;
 
-  CustomD4DicePainter(this.color);
+  CustomD4DicePainter(this.color, {this.printNumber = true});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -458,26 +475,28 @@ class CustomD4DicePainter extends CustomPainter {
     linePath.close();
     canvas.drawPath(linePath, paint);
 
-    final textStyle = TextStyle(
-      color: color,
-      fontSize: 24,
-    );
-    final textSpan = TextSpan(
-      text: '4',
-      style: textStyle,
-    );
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout(
-      minWidth: 0,
-      maxWidth: size.width,
-    );
-    final xCenter = (size.width - textPainter.width) / 2;
-    final yCenter = (size.height - textPainter.height) / 2 + 5;
-    final offset = Offset(xCenter, yCenter);
-    textPainter.paint(canvas, offset);
+    if (printNumber) {
+      final textStyle = TextStyle(
+        color: color,
+        fontSize: 24,
+      );
+      final textSpan = TextSpan(
+        text: '4',
+        style: textStyle,
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout(
+        minWidth: 0,
+        maxWidth: size.width,
+      );
+      final xCenter = (size.width - textPainter.width) / 2;
+      final yCenter = (size.height - textPainter.height) / 2 + 5;
+      final offset = Offset(xCenter, yCenter);
+      textPainter.paint(canvas, offset);
+    }
   }
 
   @override
