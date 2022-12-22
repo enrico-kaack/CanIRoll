@@ -20,7 +20,7 @@ class Server {
     peerListener = newPeerListener;
     this.getPeerList = getPeerList;
 
-    port ??= Random().nextInt(40000) + 10000;
+    port = Random().nextInt(40000) + 10000;
     var server = await HttpServer.bind(InternetAddress.anyIPv4, port!);
     print("Server running on IP : " +
         server.address.toString() +
