@@ -35,18 +35,18 @@ class SuccessRateCalculator {
 }
 
 void isolateCalcSuccessRateAndSimulate(SuccessRateCalculationInput data) {
-  int target = data.target - data.modifier;
+  int normalisedTarget = data.target - data.modifier;
 
-  var permutationResponse = calcPermutationsForDices(data.dices, target);
+  var permutationResponse =
+      calcPermutationsForDices(data.dices, normalisedTarget);
   var matching = permutationResponse.removedPermutations;
-  var allPermutationsCount = permutationResponse.permutations.length +
-      permutationResponse.removedPermutations;
+  var allPermutationsCount = permutationResponse.numberOfAllPermutations;
 
   var probability = matching / allPermutationsCount;
   data.sendPort.send({"successRate": probability});
 
   for (var d in [4, 6, 8, 10, 12, 20]) {
-    var res = calcPermutationsForDices([d], target,
+    var res = calcPermutationsForDices([d], normalisedTarget,
         permutations: permutationResponse.permutations,
         removedPermutations: permutationResponse.removedPermutations);
     data.sendPort.send({
@@ -81,6 +81,9 @@ PermutationWithRemovedPermutations calcPermutationsForDices(
 class PermutationWithRemovedPermutations {
   List<int> permutations;
   int removedPermutations;
+
+  int get numberOfAllPermutations => permutations.length + removedPermutations;
+
   PermutationWithRemovedPermutations(
       this.permutations, this.removedPermutations);
 }
