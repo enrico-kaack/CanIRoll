@@ -53,7 +53,6 @@ class StateModel extends ChangeNotifier {
 
   Future<void> calcSuccessRate(
       List<int> dices, int target, int modifier) async {
-    int target = _target - modifier;
     var resultStream = await calculator.runSuccessRateCalculationAndSimulation(
         dices, target, modifier);
     resultStream.forEach((element) {
