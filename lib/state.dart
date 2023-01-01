@@ -1,23 +1,18 @@
 import 'package:caniroll/dice.dart';
 import 'package:caniroll/preset.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 
 class StateModel extends ChangeNotifier {
   int _target = 11;
   int _modifier = 0;
-  int _presetModifier = 0;
-  String _presetName = "Preset";
 
   int get target => _target;
   int get modifier => _modifier;
-  int get presetModifier => _presetModifier;
-  String get presetName => _presetName;
 
   final List<Dice> _dices = [];
-  final List<Preset> _presets = [];
 
   List<Dice> get dices => _dices;
-  List<Preset> get presets => _presets;
 
   double succesRate = 0.0;
   double get successPercentageRounded => (succesRate * 10000).round() / 100;
@@ -84,16 +79,6 @@ class StateModel extends ChangeNotifier {
     refreshSuccessRate();
   }
 
-  void setPreset(){
-    String defaultName = "";
-    for (var d in dices) {
-      defaultName = "${defaultName}d${d.value}+";
-    }
-    defaultName = "$defaultName${modifier}";
-    _presetName = defaultName;
-    notifyListeners();
-  }
-
   void addDice(int diceNumber) {
     //enforces dice limitation due to performance
     if (_dices.isNotEmpty &&
@@ -109,26 +94,9 @@ class StateModel extends ChangeNotifier {
     refreshSuccessRate();
   }
 
-
-
-  void addPreset(){
-    List<int> values = [];
-    for (var d in dices) {
-      values.add(d.value);
-    }
-
-    _presets.add(Preset(presetName, modifier, values));
-    notifyListeners();
-  }
-
   void deleteDice(String uuid) {
     _dices.removeWhere((element) => element.id == uuid);
     refreshSuccessRate();
-  }
-
-  void deletePreset(String uuid) {
-    _presets.removeWhere((element) => element.id == uuid);
-    notifyListeners();
   }
 
   void reset() {
@@ -137,4 +105,47 @@ class StateModel extends ChangeNotifier {
     _dices.clear();
     refreshSuccessRate();
   }
+}
+
+class PresetStateModel extends ChangeNotifier {
+
+  StateModel model;
+
+  int _presetModifier = 0;
+  String _presetName = "Preset";
+
+  PresetStateModel(this.model);
+
+  int get presetModifier => _presetModifier;
+  String get presetName => _presetName;
+
+  final List<Preset> _presets = [];
+
+  List<Preset> get presets => _presets;
+
+  void setPreset(){
+    String defaultName = "";
+    for (var d in model.dices) {
+      defaultName = "${defaultName}d${d.value}+";
+    }
+    defaultName = "$defaultName${model.modifier}";
+    _presetName = defaultName;
+    notifyListeners();
+  }
+
+  void addPreset(){
+    List<int> values = [];
+    for (var d in model.dices) {
+      values.add(d.value);
+    }
+
+    _presets.add(Preset(presetName, model.modifier, values));
+    notifyListeners();
+  }
+
+  void deletePreset(String uuid) {
+    _presets.removeWhere((element) => element.id == uuid);
+    notifyListeners();
+  }
+
 }

@@ -1,5 +1,4 @@
 import 'package:uuid/uuid.dart';
-import 'package:caniroll/dice.dart';
 
 class Preset {
   late String id;

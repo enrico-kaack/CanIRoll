@@ -8,10 +8,20 @@ import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => StateModel(),
-      child: const MyApp(),
-    ),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<StateModel>(create: (context) => StateModel(),),
+        ChangeNotifierProvider<PresetStateModel>(
+          create: (context) => PresetStateModel(
+              Provider.of<StateModel>(context, listen: false),
+          ),
+        ),
+      ],
+      child: const MyApp(),),
+    //ChangeNotifierProvider(
+      //create: (context) => StateModel(),
+      //child: const MyApp(),
+    //),
   );
 }
 
@@ -41,8 +51,8 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () => {
-                Provider.of<StateModel>(context, listen: false).setPreset(),
-                Provider.of<StateModel>(context, listen: false).addPreset(),
+                Provider.of<PresetStateModel>(context, listen: false).setPreset(),
+                Provider.of<PresetStateModel>(context, listen: false).addPreset(),
               },
               icon: Icon(Icons.add)
           ),
@@ -56,29 +66,10 @@ class HomePage extends StatelessWidget {
       body: Consumer<StateModel>(
         builder: (context, model, child) {
           List<Widget> dices = [];
-          List<Widget> presets = [];
           for (var d in model.dices) {
             dices.add(OutlinedButton(
                 onPressed: () => model.deleteDice(d.id),
                 child: Text("d${d.value}")));
-          }
-          for (var p in model.presets) {
-            presets.add(OutlinedButton(
-                onPressed: () =>
-                {
-                  model.reset(),
-                  model.setModifier(p.modifier),
-                    for (var e in p.dices) {
-                      model.addDice(e),
-                      for (var d in model.dices) {
-                        dices.add(OutlinedButton(
-                            onPressed: () => model.deleteDice(d.id),
-                            child: Text("d${d.value}"))),
-                      },
-                    },
-                },
-                onLongPress: () => model.deletePreset(p.id),
-                child: Text(p.name)));
           }
           return Column(
               children: <Widget>[
@@ -138,14 +129,33 @@ class HomePage extends StatelessWidget {
                 Text(model.successPercentageRounded.toString()),
                 const Text("Chances for failure"),
                 Text(model.failurePercentageRounded.toString()),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxHeight: 40,
-                  ),
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: presets,
-                  ),
+
+                Consumer<PresetStateModel>(
+                  builder: (context, value, child) {
+                    List<Widget> presets = [];
+                    for (var p in Provider.of<PresetStateModel>(context, listen: false).presets) {
+                      presets.add(OutlinedButton(
+                          onPressed: () =>
+                          {
+                            model.reset(),
+                            model.setModifier(p.modifier),
+                            for (var e in p.dices) {
+                              model.addDice(e),
+                            },
+                          },
+                          onLongPress: () => Provider.of<PresetStateModel>(context, listen: false).deletePreset(p.id),
+                          child: Text(p.name)));
+                    }
+                    return ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxHeight: 40,
+                      ),
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: presets,
+                      ),
+                    );
+                  },
                 ),
               ],
             );
