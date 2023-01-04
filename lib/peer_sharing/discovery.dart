@@ -1,7 +1,6 @@
 import 'dart:math';
 
-import 'package:caniroll/peer_sharing/server.dart';
-import 'package:flutter/services.dart';
+import 'package:caniroll/peer_sharing/peer.dart';
 import 'package:nsd/nsd.dart';
 
 class DiscoveryService {

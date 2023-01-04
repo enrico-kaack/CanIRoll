@@ -1,6 +1,7 @@
 import 'package:caniroll/peer_sharing/dice_with_success_rate.dart';
+import 'package:caniroll/peer_sharing/peer.dart';
 import 'package:caniroll/peer_sharing/peer_share.dart';
-import 'package:caniroll/peer_sharing/server.dart';
+import 'package:caniroll/peer_sharing/push_data.dart';
 import 'package:flutter/material.dart';
 
 class PeerShareStateModel extends ChangeNotifier {

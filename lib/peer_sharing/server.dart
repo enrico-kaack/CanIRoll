@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:caniroll/peer_sharing/dice_with_success_rate.dart';
+import 'package:caniroll/peer_sharing/peer.dart';
+import 'package:caniroll/peer_sharing/push_data.dart';
 
 class Server {
   bool isRunning = false;
@@ -86,48 +87,4 @@ class Server {
         ..close();
     }
   }
-}
-
-class Peer {
-  int id;
-  String hostname;
-  int port;
-
-  get url => "$hostname:$port";
-
-  Peer(this.id, this.hostname, this.port);
-
-  Peer.fromJson(Map<String, dynamic> json)
-      : id = json["id"],
-        hostname = json["host"],
-        port = json["port"];
-
-  Map<String, dynamic> toJson() => {"id": id, "host": hostname, "port": port};
-
-  bool operator ==(Object other) {
-    if (other.runtimeType != runtimeType) {
-      return false;
-    }
-    return other is Peer && other.id == id && other.port == port;
-  }
-
-  @override
-  int get hashCode => Object.hash(hostname, port);
-
-  @override
-  String toString() {
-    return url;
-  }
-}
-
-class PushData {
-  Peer id;
-  DiceWithSuccessRate data;
-
-  PushData(this.id, this.data);
-  PushData.fromJson(Map<String, dynamic> json)
-      : id = Peer.fromJson(json["id"]),
-        data = DiceWithSuccessRate.fromJson(json["data"]);
-
-  Map<String, dynamic> toJson() => {"id": id.toJson(), "data": data.toJson()};
 }

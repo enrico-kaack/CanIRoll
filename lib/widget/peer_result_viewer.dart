@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:caniroll/peer_sharing/dice_with_success_rate.dart';
-import 'package:caniroll/peer_sharing/server.dart';
+import 'package:caniroll/peer_sharing/peer.dart';
 import 'package:caniroll/widget/double_stack_text.dart';
 import 'package:caniroll/widget/resizeable_dice.dart';
 import 'package:flutter/material.dart';

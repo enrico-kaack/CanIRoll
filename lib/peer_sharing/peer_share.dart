@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:caniroll/peer_sharing/client.dart';
 import 'package:caniroll/peer_sharing/dice_with_success_rate.dart';
 import 'package:caniroll/peer_sharing/discovery.dart';
+import 'package:caniroll/peer_sharing/peer.dart';
+import 'package:caniroll/peer_sharing/push_data.dart';
 import 'package:caniroll/peer_sharing/server.dart';
 
 class PeerSharer {
