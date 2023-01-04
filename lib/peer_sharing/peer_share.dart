@@ -9,9 +9,10 @@ class PeerSharer {
   Server server = Server();
   Client client = Client();
   DiscoveryService discovery = DiscoveryService();
-  List<Peer> peers = [];
 
-  get id => Peer(Platform.localHostname, server.port!);
+  Set<Peer> peers = {};
+
+  get id => Peer(discovery.randomSeed, Platform.localHostname, server.port!);
 
   late Function(PushData) newDataListener;
   late Function() notifyListener;
@@ -24,8 +25,8 @@ class PeerSharer {
     server.startListeningServer(
         newDataListener,
         peerDiscoveredListener,
-        () =>
-            peers); //TODO probably wait till server is fully started and ready to accept connections
+        () => peers
+            .toList()); //TODO probably wait till server is fully started and ready to accept connections
     await discovery
         .advertiseServiceToOtherDevices(server.port!); //TODO error handling
     await discovery.searchForDevices(peerDiscoveredListener);
@@ -37,15 +38,12 @@ class PeerSharer {
     server = Server();
     client = Client();
     discovery = DiscoveryService();
-    peers = [];
+    peers = {};
     notifyListener();
   }
 
   Future<void> peerDiscoveredListener(Peer p) async {
-    if (!peers.contains(p) &&
-        server.port != null &&
-        !p.hostname.contains(Platform.localHostname) &&
-        p.port != server.port!) {
+    if (server.port != null && !peerAlreadyKnown(p)) {
       print("new peer $p");
       peers.add(p);
       notifyListener();
@@ -60,5 +58,9 @@ class PeerSharer {
     for (var target in peers) {
       await client.sendPush(target, id, data);
     }
+  }
+
+  bool peerAlreadyKnown(Peer p) {
+    return peers.any((element) => element == p);
   }
 }
