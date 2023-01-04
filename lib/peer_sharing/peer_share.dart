@@ -14,7 +14,7 @@ class PeerSharer {
 
   Set<Peer> peers = {};
 
-  get id => Peer(discovery.randomSeed, Platform.localHostname, server.port!);
+  get id => Peer(discovery.selfId, Platform.localHostname, server.port!);
 
   late Function(PushData) newDataListener;
   late Function() notifyListener;
@@ -45,7 +45,7 @@ class PeerSharer {
   }
 
   Future<void> peerDiscoveredListener(Peer p) async {
-    if (server.port != null && !peerAlreadyKnown(p)) {
+    if (server.port != null && !peerAlreadyKnown(p) && !isPeerSelf(p)) {
       print("new peer $p");
       peers.add(p);
       notifyListener();
@@ -64,5 +64,9 @@ class PeerSharer {
 
   bool peerAlreadyKnown(Peer p) {
     return peers.any((element) => element == p);
+  }
+
+  bool isPeerSelf(Peer p) {
+    return p.id == discovery.selfId;
   }
 }

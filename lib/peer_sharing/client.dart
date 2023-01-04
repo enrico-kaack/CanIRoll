@@ -35,7 +35,7 @@ class Client {
     var url = Uri.http(target.url, "/push");
     print(url);
     try {
-      var res = await http.post(
+      var res = http.post(
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -45,6 +45,6 @@ class Client {
     } catch (e) {
       print("failed sending push to $target: $e");
     }
-    //TODO handle status code
+    //TODO handle status code --> handle peer as unresponsive and remove later
   }
 }
