@@ -5,15 +5,15 @@ import 'package:caniroll/peer_sharing/push_data.dart';
 import 'package:flutter/material.dart';
 
 class PeerShareStateModel extends ChangeNotifier {
-  late PeerSharer peerSharer = PeerSharer();
+  late PeerSharer peerSharer = PeerSharer(
+    newDataListener,
+    () => notifyListeners(),
+  );
 
   Map<Peer, PeerState> peerData = {};
 
   Future<void> startServerAndDiscovery() async {
-    await peerSharer.start(
-      newDataListener,
-      () => notifyListeners(),
-    );
+    await peerSharer.start();
     notifyListeners();
   }
 
@@ -30,6 +30,11 @@ class PeerShareStateModel extends ChangeNotifier {
   Future<void> stopDiscovery() async {
     await peerSharer.discovery.stopAdvertisingToOtherDevices();
     await peerSharer.discovery.stopSearchForDevice();
+    notifyListeners();
+  }
+
+  Future<void> toggleServerRunning() async {
+    await peerSharer.toggleServerRunning();
     notifyListeners();
   }
 

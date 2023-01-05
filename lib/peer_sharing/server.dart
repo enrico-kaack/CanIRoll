@@ -6,30 +6,28 @@ import 'package:caniroll/peer_sharing/peer.dart';
 import 'package:caniroll/peer_sharing/push_data.dart';
 
 class Server {
-  bool isRunning = false;
-  int? port;
+  bool get isRunning => _server != null;
+  int port = Random().nextInt(40000) + 10000;
+
+  HttpServer? _server;
 
   late Function(PushData) newDataListener;
   late Function(Peer) peerListener;
   late List<Peer> Function() getPeerList;
 
-  Server();
+  Server(this.newDataListener, this.peerListener, this.getPeerList);
 
-  Future<void> startListeningServer(Function(PushData) newDataListener,
-      Function(Peer) newPeerListener, List<Peer> Function() getPeerList) async {
-    this.newDataListener = newDataListener;
-    peerListener = newPeerListener;
-    this.getPeerList = getPeerList;
-
-    port = Random().nextInt(40000) + 10000;
-    var server = await HttpServer.bind(InternetAddress.anyIPv4, port!);
+  Future<void> startListeningServer() async {
+    _server = await HttpServer.bind(InternetAddress.anyIPv4, port!);
     print("Server running on IP : " +
-        server.address.toString() +
+        _server!.address.toString() +
         " On Port : " +
-        server.port.toString());
-    isRunning = true;
+        _server!.port.toString());
+    handleRequests();
+  }
 
-    await for (var request in server) {
+  Future<void> handleRequests() async {
+    await for (var request in _server!) {
       print("received request ${request.requestedUri.path}");
       switch (request.method) {
         case "POST":
@@ -45,11 +43,15 @@ class Server {
                 ..statusCode = 404
                 ..close();
           }
-
           break;
         default:
       }
     }
+  }
+
+  Future<void> stop() async {
+    await _server?.close(force: true);
+    _server = null;
   }
 
   Future<void> handleHello(HttpRequest req) async {

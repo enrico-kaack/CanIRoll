@@ -8,7 +8,7 @@ import 'package:caniroll/peer_sharing/push_data.dart';
 import 'package:caniroll/peer_sharing/server.dart';
 
 class PeerSharer {
-  Server server = Server();
+  late Server server;
   Client client = Client();
   DiscoveryService discovery = DiscoveryService();
 
@@ -18,26 +18,24 @@ class PeerSharer {
 
   late Function(PushData) newDataListener;
   late Function() notifyListener;
-  PeerSharer();
+  PeerSharer(this.newDataListener, this.notifyListener) {
+    server =
+        Server(newDataListener, peerDiscoveredListener, () => peers.toList());
+  }
 
-  Future<void> start(Function(PushData) dataListenerCallback,
-      Function() notifyListenerCallback) async {
-    newDataListener = dataListenerCallback;
-    notifyListener = notifyListenerCallback;
-    server.startListeningServer(
-        newDataListener,
-        peerDiscoveredListener,
-        () => peers
-            .toList()); //TODO probably wait till server is fully started and ready to accept connections
-    await discovery
-        .advertiseServiceToOtherDevices(server.port!); //TODO error handling
+  Future<void> start() async {
+    await server.startListeningServer();
+    await discovery.advertiseServiceToOtherDevices(server.port!);
     await discovery.searchForDevices(peerDiscoveredListener);
   }
 
+  // reset stops server, discovery and discoverable and recreates a new session with new port and id
   Future<void> reset() async {
     await discovery.stopAdvertisingToOtherDevices();
     await discovery.stopSearchForDevice();
-    server = Server();
+    await server.stop();
+    server =
+        Server(newDataListener, peerDiscoveredListener, () => peers.toList());
     client = Client();
     discovery = DiscoveryService();
     peers = {};
@@ -59,6 +57,14 @@ class PeerSharer {
   Future<void> broadCastUpdate(DiceWithSuccessRate data) async {
     for (var target in peers) {
       await client.sendPush(target, id, data);
+    }
+  }
+
+  Future<void> toggleServerRunning() async {
+    if (server.isRunning) {
+      await server.stop();
+    } else {
+      await start();
     }
   }
 

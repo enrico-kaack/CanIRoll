@@ -28,7 +28,7 @@ class PeerSharePage extends StatelessWidget {
                   GestureDetector(
                     onTap: () =>
                         Provider.of<PeerShareStateModel>(context, listen: false)
-                            .startServerAndDiscovery(),
+                            .toggleServerRunning(),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
@@ -44,9 +44,9 @@ class PeerSharePage extends StatelessWidget {
                             thickness: 3,
                             color: Colors.black,
                           ),
-                          model.peerSharer.server.port != null
+                          model.peerSharer.server.isRunning
                               ? Text(
-                                  "Server\n on :${model.peerSharer.server.port ?? ""}",
+                                  "Server\n on :${model.peerSharer.server.port}",
                                   textAlign: TextAlign.center,
                                 )
                               : const Text(
