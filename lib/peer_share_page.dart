@@ -22,25 +22,117 @@ class PeerSharePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              ElevatedButton(
-                child: const Text('Start Server & Discovery'),
-                onPressed: () =>
-                    Provider.of<PeerShareStateModel>(context, listen: false)
-                        .startServerAndDiscovery(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: () =>
+                        Provider.of<PeerShareStateModel>(context, listen: false)
+                            .startServerAndDiscovery(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.dns,
+                            color: model.peerSharer.server.isRunning
+                                ? Colors.greenAccent
+                                : Colors.redAccent,
+                          ),
+                          const Divider(
+                            height: 5,
+                            thickness: 3,
+                            color: Colors.black,
+                          ),
+                          model.peerSharer.server.port != null
+                              ? Text(
+                                  "Server\n on :${model.peerSharer.server.port ?? ""}",
+                                  textAlign: TextAlign.center,
+                                )
+                              : const Text(
+                                  "Server\nstopped",
+                                  textAlign: TextAlign.center,
+                                )
+                        ],
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () =>
+                        Provider.of<PeerShareStateModel>(context, listen: false)
+                            .toggleDiscovery(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.manage_search,
+                            color: model.peerSharer.discovery.isDiscovering
+                                ? Colors.greenAccent
+                                : Colors.redAccent,
+                          ),
+                          const Divider(
+                            height: 5,
+                            thickness: 3,
+                            color: Colors.black,
+                          ),
+                          model.peerSharer.discovery.isDiscovering
+                              ? const Text(
+                                  "Discovery\n running",
+                                  textAlign: TextAlign.center,
+                                )
+                              : const Text(
+                                  "Discovery\nstopped",
+                                  textAlign: TextAlign.center,
+                                )
+                        ],
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () =>
+                        Provider.of<PeerShareStateModel>(context, listen: false)
+                            .toggleDiscoverable(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.podcasts,
+                            color: model.peerSharer.discovery.isDiscoverable
+                                ? Colors.greenAccent
+                                : Colors.redAccent,
+                          ),
+                          const Divider(
+                            height: 5,
+                            thickness: 3,
+                            color: Colors.black,
+                          ),
+                          model.peerSharer.discovery.isDiscoverable
+                              ? const Text(
+                                  "Discoverable\n",
+                                  textAlign: TextAlign.center,
+                                )
+                              : const Text(
+                                  "Undiscoverable\n",
+                                  textAlign: TextAlign.center,
+                                )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              ElevatedButton(
-                child: const Text('Stop Discovery/being Discoverable'),
-                onPressed: () =>
-                    Provider.of<PeerShareStateModel>(context, listen: false)
-                        .stopDiscovery(),
-              ),
-              Text(
-                  "Network Service Discovery discovering running: ${model.peerSharer.discovery.isDiscovering.toString()}"),
-              Text(
-                  "Network Service Discovery discoverable: ${model.peerSharer.discovery.isDiscoverable.toString()}"),
-              Text(
-                  "Server running: ${model.peerSharer.server.isRunning.toString()} on port ${model.peerSharer.server.port.toString()}"),
-              ...model.peerSharer.peers.map((e) => Text(e.toString())).toList(),
+              Expanded(
+                child: ListView(
+                  children: model.peerSharer.peers
+                      .map((e) => ListTile(
+                            title: Text(e.id.toString()),
+                            subtitle: Text(e.url),
+                          ))
+                      .toList(),
+                ),
+              )
             ],
           );
         }),

@@ -32,6 +32,16 @@ class PeerShareStateModel extends ChangeNotifier {
     await peerSharer.discovery.stopSearchForDevice();
     notifyListeners();
   }
+
+  Future<void> toggleDiscovery() async {
+    await peerSharer.toggleSearchForDevice();
+    notifyListeners();
+  }
+
+  Future<void> toggleDiscoverable() async {
+    await peerSharer.toggleAdvertiseServiceToOtherDevices();
+    notifyListeners();
+  }
 }
 
 class PeerState {

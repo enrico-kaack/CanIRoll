@@ -62,6 +62,22 @@ class PeerSharer {
     }
   }
 
+  Future<void> toggleSearchForDevice() async {
+    if (discovery.isDiscovering) {
+      await discovery.stopSearchForDevice();
+    } else {
+      await discovery.searchForDevices(peerDiscoveredListener);
+    }
+  }
+
+  Future<void> toggleAdvertiseServiceToOtherDevices() async {
+    if (discovery.isDiscoverable) {
+      await discovery.stopAdvertisingToOtherDevices();
+    } else if (server.isRunning) {
+      await discovery.advertiseServiceToOtherDevices(server.port!);
+    }
+  }
+
   bool peerAlreadyKnown(Peer p) {
     return peers.any((element) => element == p);
   }
