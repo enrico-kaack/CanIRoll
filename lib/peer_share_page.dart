@@ -125,10 +125,14 @@ class PeerSharePage extends StatelessWidget {
               ),
               Expanded(
                 child: ListView(
-                  children: model.peerSharer.peers
+                  children: model.peerSharer.peerData.entries
                       .map((e) => ListTile(
-                            title: Text(e.id.toString()),
-                            subtitle: Text(e.url),
+                            title: Text(e.key.id.toString()),
+                            subtitle: Text(e.key.url),
+                            leading: Icon(Icons.circle_outlined,
+                                color: e.value.isActive
+                                    ? Colors.greenAccent
+                                    : Colors.blueGrey),
                           ))
                       .toList(),
                 ),

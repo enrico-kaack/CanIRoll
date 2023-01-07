@@ -134,8 +134,10 @@ class HomePage extends StatelessWidget {
                 return Expanded(
                   child: ListView(
                     children: [
-                      ...model.peerData.entries.map((v) => PeerResultViewer(
-                          v.value.latestData, v.key, v.value.received)),
+                      ...model.peerSharer.peerData.entries
+                          .where((element) => element.value.latestData != null)
+                          .map((v) => PeerResultViewer(v.value.latestData!,
+                              v.key, v.value.latestDataReceived!))
                     ],
                   ),
                 );

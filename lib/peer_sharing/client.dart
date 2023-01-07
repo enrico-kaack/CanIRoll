@@ -9,6 +9,10 @@ import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 
 class Client {
+  Function(Peer) peerListenerHealthy;
+
+  Client(this.peerListenerHealthy);
+
   Future<List<Peer>> sendHello(Peer p, Peer id) async {
     var url = Uri.http(p.url, "/hello");
     print(url);
@@ -25,6 +29,7 @@ class Client {
         body: jsonEncode(id),
       );
       if (res.statusCode == 200) {
+        peerListenerHealthy(p);
         return (jsonDecode(res.body) as List)
             .map((e) => Peer.fromJson(e))
             .toList();
@@ -55,11 +60,39 @@ class Client {
         },
         body: jsonEncode(PushData(id, data)),
       );
+      if (res.statusCode == HttpStatus.ok) {
+        peerListenerHealthy(target);
+      }
     } on TimeoutException catch (e) {
       print("Timeout: failed sending push to $target: $e");
     } catch (e) {
       print("failed sending push to $target: $e");
     }
     //TODO handle status code --> handle peer as unresponsive and remove later
+  }
+
+  Future<void> sendHealthCheck(Peer target, Peer id, List<Peer> peers) async {
+    var url = Uri.http(target.url, "/health");
+    print("health checking ${target.url}  ${target.id}");
+    final httpClient = HttpClient();
+    httpClient.connectionTimeout = const Duration(seconds: 10);
+    final client = IOClient(httpClient);
+    Response res;
+    try {
+      res = await client.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(HealthCheckRequestData(id, peers)),
+      );
+      if (res.statusCode == HttpStatus.ok) {
+        peerListenerHealthy(target);
+      }
+    } on TimeoutException catch (e) {
+      print("Timeout: failed health check to $target: $e");
+    } catch (e) {
+      print("failed health check to $target: $e");
+    }
   }
 }

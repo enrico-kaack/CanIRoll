@@ -14,8 +14,10 @@ class Server {
   late Function(PushData) newDataListener;
   late Function(Peer) peerListener;
   late List<Peer> Function() getPeerList;
+  late Function(Peer) peerHealthyListener;
 
-  Server(this.newDataListener, this.peerListener, this.getPeerList);
+  Server(this.newDataListener, this.peerListener, this.getPeerList,
+      this.peerHealthyListener);
 
   Future<void> startListeningServer() async {
     _server = await HttpServer.bind(InternetAddress.anyIPv4, port!);
@@ -37,6 +39,9 @@ class Server {
               break;
             case "/push":
               await handlePush(request);
+              break;
+            case "/health":
+              await handleHealthCheck(request);
               break;
             default:
               request.response
@@ -64,7 +69,28 @@ class Server {
         ..headers.contentType = ContentType.json
         ..write(jsonEncode(getPeerList()))
         ..close();
+      peerHealthyListener(data);
     } catch (e) {
+      req.response
+        ..statusCode = HttpStatus.internalServerError
+        ..write('Exception: $e.')
+        ..close();
+    }
+  }
+
+  Future<void> handleHealthCheck(HttpRequest req) async {
+    try {
+      String content = await utf8.decoder.bind(req).join();
+      var data = HealthCheckRequestData.fromJson(jsonDecode(content));
+      req.response
+        ..statusCode = HttpStatus.ok
+        ..close();
+      peerHealthyListener(data.id);
+      for (var peer in data.peers) {
+        await peerListener(peer);
+      }
+    } catch (e) {
+      print("Failed receiving health check request: $e");
       req.response
         ..statusCode = HttpStatus.internalServerError
         ..write('Exception: $e.')
@@ -82,6 +108,7 @@ class Server {
       req.response
         ..statusCode = HttpStatus.ok
         ..close();
+      peerHealthyListener(data.id);
     } catch (e) {
       req.response
         ..statusCode = HttpStatus.internalServerError

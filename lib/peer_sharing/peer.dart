@@ -22,7 +22,7 @@ class Peer {
   }
 
   @override
-  int get hashCode => Object.hash(hostname, port);
+  int get hashCode => Object.hash(id, port);
 
   @override
   String toString() {

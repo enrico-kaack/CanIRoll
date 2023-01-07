@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:caniroll/peer_sharing/client.dart';
@@ -9,18 +10,23 @@ import 'package:caniroll/peer_sharing/server.dart';
 
 class PeerSharer {
   late Server server;
-  Client client = Client();
+  late Client client;
   DiscoveryService discovery = DiscoveryService();
 
-  Set<Peer> peers = {};
+  get peers => peerData.keys;
+  Map<Peer, PeerState> peerData = {};
 
   get id => Peer(discovery.selfId, Platform.localHostname, server.port!);
 
-  late Function(PushData) newDataListener;
   late Function() notifyListener;
-  PeerSharer(this.newDataListener, this.notifyListener) {
-    server =
-        Server(newDataListener, peerDiscoveredListener, () => peers.toList());
+
+  Timer? _timer;
+
+  PeerSharer(this.notifyListener) {
+    server = Server(dataReceivedListener, peerDiscoveredListener,
+        () => peers.toList(), peerHealthyListener);
+    client = Client(peerHealthyListener);
+    healthChecker();
   }
 
   Future<void> start() async {
@@ -34,19 +40,52 @@ class PeerSharer {
     await discovery.stopAdvertisingToOtherDevices();
     await discovery.stopSearchForDevice();
     await server.stop();
-    server =
-        Server(newDataListener, peerDiscoveredListener, () => peers.toList());
-    client = Client();
+    server = Server(dataReceivedListener, peerDiscoveredListener,
+        () => peers.toList(), peerHealthyListener);
+    client = Client(peerHealthyListener);
     discovery = DiscoveryService();
-    peers = {};
+    peerData = {};
+    notifyListener();
+  }
+
+  Future<void> healthChecker() async {
+    _timer = Timer.periodic(
+      const Duration(seconds: 20),
+      (timer) {
+        for (var p in peers) {
+          client.sendHealthCheck(p, id, peers.toList());
+        }
+        notifyListener();
+      },
+    );
+  }
+
+  Future<void> dataReceivedListener(PushData data) async {
+    var peerState = PeerState.receivedNow(data.data);
+    peerData.update(data.id, (value) {
+      value.latestData = data.data;
+      value.latestDataReceived = DateTime.now();
+      return value;
+    }, ifAbsent: () => PeerState.receivedNow(data.data));
+    notifyListener();
+  }
+
+  Future<void> peerHealthyListener(Peer p) async {
+    peerData.update(
+      p,
+      (value) {
+        value.receivedHealthyNow();
+        return value;
+      },
+      ifAbsent: () => PeerState.healthyNow(),
+    );
     notifyListener();
   }
 
   Future<void> peerDiscoveredListener(Peer p) async {
     if (server.port != null && !peerAlreadyKnown(p) && !isPeerSelf(p)) {
       print("new peer $p");
-      peers.add(p);
-      notifyListener();
+      peerData.putIfAbsent(p, () => PeerState());
       var receivedPeers = await client.sendHello(p, id);
       for (var r in receivedPeers) {
         await peerDiscoveredListener(r);
@@ -90,5 +129,28 @@ class PeerSharer {
 
   bool isPeerSelf(Peer p) {
     return p.id == discovery.selfId;
+  }
+}
+
+class PeerState {
+  DiceWithSuccessRate? latestData;
+  DateTime? latestDataReceived;
+  late DateTime lastHealthy;
+
+  Duration get timeSinceLastHealthy => DateTime.now().difference(lastHealthy);
+  bool get isActive => timeSinceLastHealthy.abs().inSeconds < 60;
+
+  PeerState.receivedNow(this.latestData)
+      : latestDataReceived = DateTime.now(),
+        lastHealthy = DateTime.now();
+
+  PeerState.healthyNow() : lastHealthy = DateTime.now();
+
+  PeerState() {
+    lastHealthy = DateTime.fromMillisecondsSinceEpoch(0);
+  }
+
+  void receivedHealthyNow() {
+    lastHealthy = DateTime.now();
   }
 }
