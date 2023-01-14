@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:caniroll/peer_sharing/restartable_periodic_timer.dart';
 import 'package:caniroll/peer_sharing/client.dart';
 import 'package:caniroll/peer_sharing/dice_with_success_rate.dart';
 import 'package:caniroll/peer_sharing/discovery.dart';
@@ -20,12 +21,14 @@ class PeerSharer {
 
   late Function() notifyListener;
 
-  Timer? _timer;
+  late RestartablePeriodicTimer _timer;
 
   PeerSharer(this.notifyListener) {
     server = Server(dataReceivedListener, peerDiscoveredListener,
         () => peers.toList(), peerHealthyListener);
     client = Client(peerHealthyListener);
+    _timer = RestartablePeriodicTimer(
+        timerCallbackFunction, const Duration(seconds: 20));
   }
 
   Future<void> start() async {
@@ -49,28 +52,19 @@ class PeerSharer {
   }
 
   Future<void> startHealthChecking() async {
-    // delete inactive timer since we cant restart
-    if (_timer != null && _timer!.isActive) {
-      _timer = null;
+    _timer.start();
+  }
+
+  void timerCallbackFunction() {
+    print("health check timer running");
+    for (var p in peers) {
+      client.sendHealthCheck(p, id, peers.toList());
     }
-    _timer ??= Timer.periodic(
-      const Duration(seconds: 20),
-      (timer) {
-        print("health check timer running");
-        for (var p in peers) {
-          client.sendHealthCheck(p, id, peers.toList());
-        }
-        notifyListener();
-      },
-    );
+    notifyListener();
   }
 
   Future<void> stopHealthChecking() async {
-    if (_timer != null && _timer!.isActive) {
-      _timer!.cancel();
-      _timer = null;
-      print("timer canceled ${_timer?.isActive}");
-    }
+    _timer.stop();
   }
 
   Future<void> dataReceivedListener(PushData data) async {
