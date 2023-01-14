@@ -23,7 +23,7 @@ class PeerShareStateModel extends ChangeNotifier {
   }
 
   Future<void> toggleServerRunning() async {
-    await peerSharer.toggleServerRunning();
+    await peerSharer.toggleServerAndHealthCheckRunning();
     notifyListeners();
   }
 

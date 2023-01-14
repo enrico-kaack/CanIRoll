@@ -30,7 +30,8 @@ class Server {
 
   Future<void> handleRequests() async {
     await for (var request in _server!) {
-      print("received request ${request.requestedUri.path}");
+      print(
+          "received request ${request.requestedUri.path} from ${request.connectionInfo?.remoteAddress}");
       switch (request.method) {
         case "POST":
           switch (request.requestedUri.path) {
@@ -86,6 +87,8 @@ class Server {
         ..statusCode = HttpStatus.ok
         ..close();
       peerHealthyListener(data.id);
+      // also receive a list of known peers from the sender
+      // update own peer list if necessary
       for (var peer in data.peers) {
         await peerListener(peer);
       }

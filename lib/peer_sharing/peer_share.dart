@@ -13,7 +13,7 @@ class PeerSharer {
   late Client client;
   DiscoveryService discovery = DiscoveryService();
 
-  get peers => peerData.keys;
+  List<Peer> get peers => peerData.keys.toList();
   Map<Peer, PeerState> peerData = {};
 
   get id => Peer(discovery.selfId, Platform.localHostname, server.port!);
@@ -26,13 +26,13 @@ class PeerSharer {
     server = Server(dataReceivedListener, peerDiscoveredListener,
         () => peers.toList(), peerHealthyListener);
     client = Client(peerHealthyListener);
-    healthChecker();
   }
 
   Future<void> start() async {
     await server.startListeningServer();
     await discovery.advertiseServiceToOtherDevices(server.port!);
     await discovery.searchForDevices(peerDiscoveredListener);
+    startHealthChecking();
   }
 
   // reset stops server, discovery and discoverable and recreates a new session with new port and id
@@ -48,16 +48,29 @@ class PeerSharer {
     notifyListener();
   }
 
-  Future<void> healthChecker() async {
-    _timer = Timer.periodic(
+  Future<void> startHealthChecking() async {
+    // delete inactive timer since we cant restart
+    if (_timer != null && _timer!.isActive) {
+      _timer = null;
+    }
+    _timer ??= Timer.periodic(
       const Duration(seconds: 20),
       (timer) {
+        print("health check timer running");
         for (var p in peers) {
           client.sendHealthCheck(p, id, peers.toList());
         }
         notifyListener();
       },
     );
+  }
+
+  Future<void> stopHealthChecking() async {
+    if (_timer != null && _timer!.isActive) {
+      _timer!.cancel();
+      _timer = null;
+      print("timer canceled ${_timer?.isActive}");
+    }
   }
 
   Future<void> dataReceivedListener(PushData data) async {
@@ -99,9 +112,10 @@ class PeerSharer {
     }
   }
 
-  Future<void> toggleServerRunning() async {
+  Future<void> toggleServerAndHealthCheckRunning() async {
     if (server.isRunning) {
       await server.stop();
+      await stopHealthChecking();
     } else {
       await start();
     }

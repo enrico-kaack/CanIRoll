@@ -87,6 +87,7 @@ class Client {
         body: jsonEncode(HealthCheckRequestData(id, peers)),
       );
       if (res.statusCode == HttpStatus.ok) {
+        print("healthy ${target.url}  ${target.id}");
         peerListenerHealthy(target);
       }
     } on TimeoutException catch (e) {
