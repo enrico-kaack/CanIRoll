@@ -38,6 +38,22 @@ class PeerSharer {
     startHealthChecking();
   }
 
+  Future<void> unpauseServerIfPaused() async {
+    if (server.hasEverRunBefore && !server.isRunning) {
+      print("resume paused server");
+      await server.startListeningServer();
+      await startHealthChecking();
+    }
+  }
+
+  Future<void> pauseServerAndDiscovery() async {
+    print("pause server");
+    await server.stop();
+    await discovery.stopAdvertisingToOtherDevices();
+    await discovery.stopSearchForDevice();
+    await stopHealthChecking();
+  }
+
   // reset stops server, discovery and discoverable and recreates a new session with new port and id
   Future<void> reset() async {
     await discovery.stopAdvertisingToOtherDevices();

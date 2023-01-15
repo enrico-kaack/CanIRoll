@@ -12,6 +12,16 @@ class PeerShareStateModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> unpausePausedServer() async {
+    await peerSharer.unpauseServerIfPaused();
+    notifyListeners();
+  }
+
+  Future<void> pauseServerAndDiscovery() async {
+    await peerSharer.pauseServerAndDiscovery();
+    notifyListeners();
+  }
+
   void broadcastData(DiceWithSuccessRate data) {
     peerSharer.broadCastUpdate(data);
   }

@@ -10,6 +10,8 @@ class Server {
   int port = Random().nextInt(40000) + 10000;
 
   HttpServer? _server;
+  bool _hasEverRunBefore = false;
+  bool get hasEverRunBefore => _hasEverRunBefore;
 
   late Function(PushData) newDataListener;
   late Function(Peer) peerListener;
@@ -21,6 +23,7 @@ class Server {
 
   Future<void> startListeningServer() async {
     _server = await HttpServer.bind(InternetAddress.anyIPv4, port!);
+    _hasEverRunBefore = true;
     print("Server running on IP : " +
         _server!.address.toString() +
         " On Port : " +
