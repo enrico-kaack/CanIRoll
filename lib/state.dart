@@ -1,5 +1,8 @@
 import 'package:caniroll/dice.dart';
 import 'package:caniroll/preset.dart';
+import 'package:caniroll/peer_sharing/dice_with_success_rate.dart';
+import 'package:caniroll/peer_sharing/peer_share_state.dart';
+import 'package:caniroll/success_rate_simulator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
@@ -21,57 +24,86 @@ class StateModel extends ChangeNotifier {
   double get failurePercentageRounded =>
       ((100 - successPercentageRounded) * 100).round() / 100;
 
+
+  double successRateNextD4 = 0.0;
+  double successRateNextD6 = 0.0;
+  double successRateNextD8 = 0.0;
+  double successRateNextD10 = 0.0;
+  double successRateNextD12 = 0.0;
+  double successRateNextD20 = 0.0;
+
+  SuccessRateCalculator calculator = SuccessRateCalculator();
+
+  PeerShareStateModel _peerSharerStateModel;
+
+  StateModel(this._peerSharerStateModel);
+  
   void setFromPreset(int modifier, List<int> values) {
     _modifier = modifier;
     _dices = values.map((value) => Dice(value)).toList();
     notifyListeners();
   }
 
+
   void refreshSuccessRate() async {
+    successRateNextD4 = 0.0;
+    successRateNextD6 = 0.0;
+    successRateNextD8 = 0.0;
+    successRateNextD10 = 0.0;
+    successRateNextD12 = 0.0;
+    successRateNextD20 = 0.0;
+
     if (_dices.isEmpty) {
       succesRate = 0;
       notifyListeners();
       return;
     }
 
-    succesRate = calcSuccessRate(
-        _dices.map((e) => e.value).toList(), _target, _modifier);
-    notifyListeners();
+    calcSuccessRate(_dices.map((e) => e.value).toList(), _target, _modifier);
   }
 
-  double calcSuccessRate(List<int> dices, int target, int modifier) {
-    int target = _target - modifier;
-
-    var permutations =
-        getRecursionPermutations(_dices.map((e) => e.value).toList());
-    var matching = permutations
-        .map((e) => e.reduce((value, element) => value + element))
-        .where((element) => element >= target)
-        .length;
-    return matching / permutations.length;
-  }
-
-  List<List<int>> getRecursionPermutations(List<int> dices) {
-    List<List<int>> possibilities = [];
-    if (dices.length == 1) {
-      for (var i = 1; i <= dices.first; i++) {
-        possibilities.add([i]);
+  Future<void> calcSuccessRate(
+      List<int> dices, int target, int modifier) async {
+    var resultStream = await calculator.runSuccessRateCalculationAndSimulation(
+        dices, target, modifier);
+    resultStream.forEach((element) {
+      if (element is Map<String, double>) {
+        var typedElement = element as Map<String, double>;
+        switch (typedElement.entries.first.key) {
+          case "successRate":
+            succesRate = typedElement.entries.first.value;
+            _peerSharerStateModel.broadcastData(
+                DiceWithSuccessRate(target, modifier, dices, succesRate));
+            notifyListeners();
+            break;
+          case "4":
+            successRateNextD4 = typedElement.entries.first.value;
+            notifyListeners();
+            break;
+          case "6":
+            successRateNextD6 = typedElement.entries.first.value;
+            notifyListeners();
+            break;
+          case "8":
+            successRateNextD8 = typedElement.entries.first.value;
+            notifyListeners();
+            break;
+          case "10":
+            successRateNextD10 = typedElement.entries.first.value;
+            notifyListeners();
+            break;
+          case "12":
+            successRateNextD12 = typedElement.entries.first.value;
+            notifyListeners();
+            break;
+          case "20":
+            successRateNextD20 = typedElement.entries.first.value;
+            notifyListeners();
+            break;
+          default:
+        }
       }
-      return possibilities;
-    }
-
-    var listForRecursion = dices.sublist(1);
-    var otherPosibilities = getRecursionPermutations(listForRecursion);
-    for (var i = 1; i <= dices.first; i++) {
-      List<List<int>> newComibnations = [];
-      for (var others in otherPosibilities) {
-        var newCombination = [...others];
-        newCombination.add(i);
-        newComibnations.add(newCombination);
-      }
-      possibilities.addAll(newComibnations);
-    }
-    return possibilities;
+    });
   }
 
   void setTarget(int target) {
@@ -87,15 +119,6 @@ class StateModel extends ChangeNotifier {
   }
 
   void addDice(int diceNumber) {
-    //enforces dice limitation due to performance
-    if (_dices.isNotEmpty &&
-        _dices
-                .map((e) => e.value)
-                .reduce((value, element) => value * element) >=
-            10e4) {
-      return;
-    }
-
     _dices.add(Dice(diceNumber));
     notifyListeners();
     refreshSuccessRate();
@@ -107,7 +130,6 @@ class StateModel extends ChangeNotifier {
   }
 
   void reset() {
-    _target = 10;
     _modifier = 0;
     _dices.clear();
     refreshSuccessRate();
