@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:caniroll/preset.dart';
 
 void main() {
   runApp(
@@ -52,7 +54,6 @@ class HomePage extends StatelessWidget {
           IconButton(
               onPressed: () => {
                 Provider.of<PresetStateModel>(context, listen: false).setPreset(),
-                Provider.of<PresetStateModel>(context, listen: false).addPreset(),
               },
               icon: Icon(Icons.add)
           ),
@@ -138,10 +139,7 @@ class HomePage extends StatelessWidget {
                           onPressed: () =>
                           {
                             model.reset(),
-                            model.setModifier(p.modifier),
-                            for (var e in p.dices) {
-                              model.addDice(e),
-                            },
+                            model.setFromPreset(p.modifier, p.dices),
                           },
                           onLongPress: () => Provider.of<PresetStateModel>(context, listen: false).deletePreset(p.id),
                           child: Text(p.name)));

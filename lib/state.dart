@@ -1,6 +1,7 @@
 import 'package:caniroll/dice.dart';
 import 'package:caniroll/preset.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
 class StateModel extends ChangeNotifier {
@@ -10,7 +11,7 @@ class StateModel extends ChangeNotifier {
   int get target => _target;
   int get modifier => _modifier;
 
-  final List<Dice> _dices = [];
+  List<Dice> _dices = [];
 
   List<Dice> get dices => _dices;
 
@@ -19,6 +20,12 @@ class StateModel extends ChangeNotifier {
   double get failureRate => 1 - succesRate;
   double get failurePercentageRounded =>
       ((100 - successPercentageRounded) * 100).round() / 100;
+
+  void setFromPreset(int modifier, List<int> values) {
+    _modifier = modifier;
+    _dices = values.map((value) => Dice(value)).toList();
+    notifyListeners();
+  }
 
   void refreshSuccessRate() async {
     if (_dices.isEmpty) {
@@ -119,29 +126,33 @@ class PresetStateModel extends ChangeNotifier {
   int get presetModifier => _presetModifier;
   String get presetName => _presetName;
 
-  final List<Preset> _presets = [];
+  List<Preset> _presets = [];
 
   List<Preset> get presets => _presets;
 
+  set presets(List<Preset> value) {
+    _presets = value;
+    notifyListeners();
+  }
+
   void setPreset(){
     String defaultName = "";
+    List<int> values = [];
     for (var d in model.dices) {
       defaultName = "${defaultName}d${d.value}+";
+      values.add(d.value);
     }
     defaultName = "$defaultName${model.modifier}";
     _presetName = defaultName;
-    notifyListeners();
-  }
-
-  void addPreset(){
-    List<int> values = [];
-    for (var d in model.dices) {
-      values.add(d.value);
-    }
-
     _presets.add(Preset(presetName, model.modifier, values));
+
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setStringList("presets", _presets.map((p) => p.name).toList());
+    });
+
     notifyListeners();
   }
+
 
   void deletePreset(String uuid) {
     _presets.removeWhere((element) => element.id == uuid);
