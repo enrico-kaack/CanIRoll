@@ -4,13 +4,13 @@
 
 The goal is to calculate the probability of the sum of multiple dice being larger or equal to a target.
 
-Assuming, each dice is a fair dice, the probability of rolling a certain number is $\frac{1}{n}$ for a $n$-sided dice. Rolling two n-sided dices, the probability of rolling a certain combination is $\frac{1}{n^n}. All combinations are equally likely when rolling multiple fair dice. To answer the question, all combinations need to be summed, the number of sums larger or equal to the target counted and divided by the total number of combinations.
+Assuming, each dice is a fair dice, the probability of rolling a certain number is $\frac{1}{n}$ for a $n$-sided dice. Rolling two n-sided dices, the probability of rolling a certain combination is $\frac{1}{n^n}$. All combinations are equally likely when rolling multiple fair dice. To answer the question, all combinations need to be summed, the number of sums larger or equal to the target counted and divided by the total number of combinations.
 
-This can be visualised in a tree diagram, for rolling one 6-sided dice (d6) and one 4-sided dice (d4):
+This can be visualised in a tree diagram, for rolling one 6-sided dice (d6) and one 4-sided dice (d4) with 14 out of 24 (~58,3%):
 
 ![tree diagram of probabilities rolling a d6 and d4](img/d6d4_tree_target_6.drawio.svg)
 
-A naive implementation, the first implementation approach would look similar:
+A naive, first implementation approach would look similar:
 ```
 combinations = find_all_combinations()
 matching_combinations = combinations.map((combination) => sum(combination))
@@ -18,7 +18,7 @@ matching_combinations = combinations.map((combination) => sum(combination))
 probability = matching_combinations.length() / combinations.length()
 ```
 This approach has two major problems:
-1. The number of permutations grows exponentially ($O(c^n)). The number of combinations with the possible dice could be calculated as follows. Even with just 5 d20, the calculation takes a noticeable amount of time. Since the probability should be calculated on every input change for the input, this approach is unusable beyond 4-5 dice. 
+1. The number of permutations grows exponentially ($O(c^n)$). The number of combinations $c$ with the possible dice could be calculated as $$n_c = 4^{n_{d4}} *6^{n_{d6}} *8^{n_{d8}} *10^{n_{d10}} *12^{n_{d12}} *20^{n_{d20}}$$ with $n$ being the amount of dices with the respective type. Even with just 5 d20, the calculation takes a noticeable amount of time. Since the probability should be calculated on every input change for the input, this approach is unusable beyond 4-5 dice. 
 2. The calculation is done in the main thread (in Dart/Flutter called Isolate). Therefore, the UI is not responding.
 
 The second problem is solved by running the calculation in a background isolate. Although the calculation is slow without solving the first problem, bigger calculations should not be done in the main thread to keep the UI refreshing.
