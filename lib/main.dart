@@ -26,8 +26,25 @@ void main() {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +59,22 @@ class MyApp extends StatelessWidget {
         "/peershare": (context) => PeerSharePage(),
       },
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print('state = $state');
+    switch (state) {
+      case AppLifecycleState.paused:
+        Provider.of<PeerShareStateModel>(context, listen: false)
+            .pauseServerAndDiscovery();
+        break;
+      case AppLifecycleState.resumed:
+        Provider.of<PeerShareStateModel>(context, listen: false)
+            .unpausePausedServer();
+        break;
+      default:
+    }
   }
 }
 
@@ -134,8 +167,10 @@ class HomePage extends StatelessWidget {
                 return Expanded(
                   child: ListView(
                     children: [
-                      ...model.peerData.entries.map((v) => PeerResultViewer(
-                          v.value.latestData, v.key, v.value.received)),
+                      ...model.peerSharer.peerData.entries
+                          .where((element) => element.value.latestData != null)
+                          .map((v) => PeerResultViewer(v.value.latestData!,
+                              v.key, v.value.latestDataReceived!))
                     ],
                   ),
                 );

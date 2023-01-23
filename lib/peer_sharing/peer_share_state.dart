@@ -1,24 +1,24 @@
 import 'package:caniroll/peer_sharing/dice_with_success_rate.dart';
 import 'package:caniroll/peer_sharing/peer_share.dart';
-import 'package:caniroll/peer_sharing/server.dart';
 import 'package:flutter/material.dart';
 
 class PeerShareStateModel extends ChangeNotifier {
-  late PeerSharer peerSharer = PeerSharer();
-
-  Map<Peer, PeerState> peerData = {};
+  late PeerSharer peerSharer = PeerSharer(
+    () => notifyListeners(),
+  );
 
   Future<void> startServerAndDiscovery() async {
-    await peerSharer.start(
-      newDataListener,
-      () => notifyListeners(),
-    );
+    await peerSharer.start();
     notifyListeners();
   }
 
-  void newDataListener(PushData data) {
-    var peerState = PeerState.receivedNow(data.data);
-    peerData.update(data.id, (_) => peerState, ifAbsent: () => peerState);
+  Future<void> unpausePausedServer() async {
+    await peerSharer.unpauseServerIfPaused();
+    notifyListeners();
+  }
+
+  Future<void> pauseServerAndDiscovery() async {
+    await peerSharer.pauseServerAndDiscovery();
     notifyListeners();
   }
 
@@ -31,11 +31,19 @@ class PeerShareStateModel extends ChangeNotifier {
     await peerSharer.discovery.stopSearchForDevice();
     notifyListeners();
   }
-}
 
-class PeerState {
-  DiceWithSuccessRate latestData;
-  DateTime received;
+  Future<void> toggleServerRunning() async {
+    await peerSharer.toggleServerAndHealthCheckRunning();
+    notifyListeners();
+  }
 
-  PeerState.receivedNow(this.latestData) : received = DateTime.now();
+  Future<void> toggleDiscovery() async {
+    await peerSharer.toggleSearchForDevice();
+    notifyListeners();
+  }
+
+  Future<void> toggleDiscoverable() async {
+    await peerSharer.toggleAdvertiseServiceToOtherDevices();
+    notifyListeners();
+  }
 }

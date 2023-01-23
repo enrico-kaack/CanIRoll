@@ -2,34 +2,39 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:caniroll/peer_sharing/dice_with_success_rate.dart';
+import 'package:caniroll/peer_sharing/peer.dart';
+import 'package:caniroll/peer_sharing/push_data.dart';
 
 class Server {
-  bool isRunning = false;
-  int? port;
+  bool get isRunning => _server != null;
+  int port = Random().nextInt(40000) + 10000;
+
+  HttpServer? _server;
+  bool _hasEverRunBefore = false;
+  bool get hasEverRunBefore => _hasEverRunBefore;
 
   late Function(PushData) newDataListener;
   late Function(Peer) peerListener;
   late List<Peer> Function() getPeerList;
+  late Function(Peer) peerHealthyListener;
 
-  Server();
+  Server(this.newDataListener, this.peerListener, this.getPeerList,
+      this.peerHealthyListener);
 
-  Future<void> startListeningServer(Function(PushData) newDataListener,
-      Function(Peer) newPeerListener, List<Peer> Function() getPeerList) async {
-    this.newDataListener = newDataListener;
-    peerListener = newPeerListener;
-    this.getPeerList = getPeerList;
-
-    port = Random().nextInt(40000) + 10000;
-    var server = await HttpServer.bind(InternetAddress.anyIPv4, port!);
+  Future<void> startListeningServer() async {
+    _server = await HttpServer.bind(InternetAddress.anyIPv4, port!);
+    _hasEverRunBefore = true;
     print("Server running on IP : " +
-        server.address.toString() +
+        _server!.address.toString() +
         " On Port : " +
-        server.port.toString());
-    isRunning = true;
+        _server!.port.toString());
+    handleRequests();
+  }
 
-    await for (var request in server) {
-      print("received request ${request.requestedUri.path}");
+  Future<void> handleRequests() async {
+    await for (var request in _server!) {
+      print(
+          "received request ${request.requestedUri.path} from ${request.connectionInfo?.remoteAddress}");
       switch (request.method) {
         case "POST":
           switch (request.requestedUri.path) {
@@ -39,16 +44,23 @@ class Server {
             case "/push":
               await handlePush(request);
               break;
+            case "/health":
+              await handleHealthCheck(request);
+              break;
             default:
               request.response
                 ..statusCode = 404
                 ..close();
           }
-
           break;
         default:
       }
     }
+  }
+
+  Future<void> stop() async {
+    await _server?.close(force: true);
+    _server = null;
   }
 
   Future<void> handleHello(HttpRequest req) async {
@@ -61,7 +73,30 @@ class Server {
         ..headers.contentType = ContentType.json
         ..write(jsonEncode(getPeerList()))
         ..close();
+      peerHealthyListener(data);
     } catch (e) {
+      req.response
+        ..statusCode = HttpStatus.internalServerError
+        ..write('Exception: $e.')
+        ..close();
+    }
+  }
+
+  Future<void> handleHealthCheck(HttpRequest req) async {
+    try {
+      String content = await utf8.decoder.bind(req).join();
+      var data = HealthCheckRequestData.fromJson(jsonDecode(content));
+      req.response
+        ..statusCode = HttpStatus.ok
+        ..close();
+      peerHealthyListener(data.id);
+      // also receive a list of known peers from the sender
+      // update own peer list if necessary
+      for (var peer in data.peers) {
+        await peerListener(peer);
+      }
+    } catch (e) {
+      print("Failed receiving health check request: $e");
       req.response
         ..statusCode = HttpStatus.internalServerError
         ..write('Exception: $e.')
@@ -79,6 +114,7 @@ class Server {
       req.response
         ..statusCode = HttpStatus.ok
         ..close();
+      peerHealthyListener(data.id);
     } catch (e) {
       req.response
         ..statusCode = HttpStatus.internalServerError
@@ -86,46 +122,4 @@ class Server {
         ..close();
     }
   }
-}
-
-class Peer {
-  String hostname;
-  int port;
-
-  get url => "$hostname:$port";
-
-  Peer(this.hostname, this.port);
-
-  Peer.fromJson(Map<String, dynamic> json)
-      : hostname = json["host"],
-        port = json["port"];
-
-  Map<String, dynamic> toJson() => {"host": hostname, "port": port};
-
-  bool operator ==(Object other) {
-    if (other.runtimeType != runtimeType) {
-      return false;
-    }
-    return other is Peer && other.hostname == hostname && other.port == port;
-  }
-
-  @override
-  int get hashCode => Object.hash(hostname, port);
-
-  @override
-  String toString() {
-    return url;
-  }
-}
-
-class PushData {
-  Peer id;
-  DiceWithSuccessRate data;
-
-  PushData(this.id, this.data);
-  PushData.fromJson(Map<String, dynamic> json)
-      : id = Peer.fromJson(json["id"]),
-        data = DiceWithSuccessRate.fromJson(json["data"]);
-
-  Map<String, dynamic> toJson() => {"id": id.toJson(), "data": data.toJson()};
 }
