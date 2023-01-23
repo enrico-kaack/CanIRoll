@@ -1,5 +1,3 @@
-
-import 'dart:typed_data';
 import 'package:caniroll/peer_share_page.dart';
 import 'package:caniroll/peer_sharing/peer_share_state.dart';
 import 'package:caniroll/probability_gauge.dart';
@@ -8,28 +6,13 @@ import 'package:caniroll/widget/dice_button.dart';
 import 'package:caniroll/widget/dice_with_prediction.dart';
 import 'package:caniroll/widget/peer_result_viewer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:caniroll/preset.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<StateModel>(create: (context) => StateModel(),),
-        ChangeNotifierProvider<PresetStateModel>(
-          create: (context) => PresetStateModel(
-              Provider.of<StateModel>(context, listen: false),
-          ),
-        ),
-      ],
-      child: const MyApp(),),
-    //ChangeNotifierProvider(
-      //create: (context) => StateModel(),
-      //child: const MyApp(),
-    //),
         ChangeNotifierProvider<PeerShareStateModel>(
           create: (_) => PeerShareStateModel(),
         ),
@@ -105,14 +88,8 @@ class HomePage extends StatelessWidget {
         title: const Text("Can I roll?"),
         actions: [
           IconButton(
-              onPressed: () => {
-                Provider.of<PresetStateModel>(context, listen: false).setPreset(),
-              },
-              icon: Icon(Icons.add),
-          ),
-          IconButton(
-              onPressed: () => Navigator.pushNamed(context, "/peershare"),
-              icon: Icon(Icons.sync),
+            onPressed: () => Navigator.pushNamed(context, "/peershare"),
+            icon: Icon(Icons.sync),
           ),
           IconButton(
             onPressed: () =>
@@ -130,91 +107,6 @@ class HomePage extends StatelessWidget {
           }
 
           return Column(
-              children: <Widget>[
-                NumberSwitchWidget(
-                  text: "Target",
-                  min: 0,
-                  max: 100,
-                  value: model.target,
-                  onChanged: (value) => model.setTarget(value),
-                ),
-                NumberSwitchWidget(
-                  text: "Modifier",
-                  onChanged: (value) => model.setModifier(value),
-                  min: -100,
-                  max: 100,
-                  value: model.modifier,
-                  textMapper: (v) => double.parse(v) >= 0 ? "+" + v : v,
-                ),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxHeight: 40,
-                  ),
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: dices,
-                  ),
-                ),
-                Row(
-                  children: [
-                    OutlinedButton(
-                      onPressed: () => model.addDice(4),
-                      child: const Text("d4"),
-                    ),
-                    OutlinedButton(
-                      onPressed: () => model.addDice(6),
-                      child: const Text("d6"),
-                    ),
-                    OutlinedButton(
-                      onPressed: () => model.addDice(8),
-                      child: const Text("d8"),
-                    ),
-                    OutlinedButton(
-                      onPressed: () => model.addDice(10),
-                      child: const Text("d10"),
-                    ),
-                    OutlinedButton(
-                      onPressed: () => model.addDice(12),
-                      child: const Text("d12"),
-                    ),
-                    OutlinedButton(
-                      onPressed: () => model.addDice(20),
-                      child: const Text("d20"),
-                    )
-                  ],
-                ),
-                const Text("Chances for success"),
-                Text(model.successPercentageRounded.toString()),
-                const Text("Chances for failure"),
-                Text(model.failurePercentageRounded.toString()),
-
-                Consumer<PresetStateModel>(
-                  builder: (context, value, child) {
-                    List<Widget> presets = [];
-                    for (var p in Provider.of<PresetStateModel>(context, listen: false).presets) {
-                      presets.add(OutlinedButton(
-                          onPressed: () =>
-                          {
-                            model.reset(),
-                            model.setFromPreset(p.modifier, p.dices),
-                          },
-                          onLongPress: () => Provider.of<PresetStateModel>(context, listen: false).deletePreset(p.id),
-                          child: Text(p.name)));
-                    }
-                    return ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxHeight: 40,
-                      ),
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: presets,
-                      ),
-                    );
-                  },
-                ),
-              ],
-            );
-        }
             children: <Widget>[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -290,7 +182,6 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-
 
 class NumberSwitchWidget extends StatelessWidget {
   final String text;
