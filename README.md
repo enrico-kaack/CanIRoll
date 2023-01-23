@@ -6,11 +6,10 @@ CanIRoll is an Android and iOS application to calculate the success rate of reac
 
 ## Features
 
-- Calculate the success rate of throwing multiple dices against a target sum with a static modifier (e.g. +1)
+- Calculate the success rate of throwing multiple dices against a target sum with a static modifier.
 - Simple UI, fast to use.
 - Success rate prediction when rolling another die.
 - Multi-Peer Sharing: Effortlessly share your calculation in the same local network with other devices.
-
 
 ## how to run
 

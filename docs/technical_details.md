@@ -27,8 +27,6 @@ Whenever a new calculation is required, old background isolates are cancelled an
 For the first problem, the exponential growth of combinations is the root cause of slow calculations. One approach would be to find a mathematical way of solving the problem without exploring all combinations. Another approach would be to reduce the number of combinations by utilising the desired use case: The target sum is in the range of 10-20. If we have three dice, then we already have several combinations that hit the target sum. Adding another dice to that combination would automatically hit the target and thus not need to be explored further. The more dice we add, the fewer combinations need to be explored. The algorithm is still in exponential complexity (when having large targets), but with practical, small targets, another dice would add fewer and less explorable combinations. This improvement can be shown in the tree diagram:
 ![optimised tree diagram of probabilities rolling a d6 and d4](img/d6d4_optimized_tree_target_4.drawio.svg)
 
-//TODO: number of explorable combinations with fixed target and adding dice (one target, all dice plotted)
-
 The optimized implementation iteratively adds the dice and checks which combinations need to be explored further:
 ```
 # only track the sum of a permutation, the actual combination is not relevant
