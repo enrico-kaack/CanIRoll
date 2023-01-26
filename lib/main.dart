@@ -148,17 +148,17 @@ class HomePage extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   children: [
                     DiceWithSuccessRatePrediction(
-                        4, () => model.addDice(4), model.successRateNextD4),
+                        4, () => model.addDice(4), model.successRates[4]),
                     DiceWithSuccessRatePrediction(
-                        6, () => model.addDice(6), model.successRateNextD6),
+                        6, () => model.addDice(6), model.successRates[6]),
                     DiceWithSuccessRatePrediction(
-                        8, () => model.addDice(8), model.successRateNextD8),
+                        8, () => model.addDice(8), model.successRates[8]),
                     DiceWithSuccessRatePrediction(
-                        10, () => model.addDice(10), model.successRateNextD10),
+                        10, () => model.addDice(10), model.successRates[10]),
                     DiceWithSuccessRatePrediction(
-                        12, () => model.addDice(12), model.successRateNextD12),
+                        12, () => model.addDice(12), model.successRates[12]),
                     DiceWithSuccessRatePrediction(
-                        20, () => model.addDice(20), model.successRateNextD20),
+                        20, () => model.addDice(20), model.successRates[20]),
                   ],
                 ),
               ),

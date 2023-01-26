@@ -21,12 +21,7 @@ class StateModel extends ChangeNotifier {
   double get failurePercentageRounded =>
       ((100 - successPercentageRounded) * 100).round() / 100;
 
-  double successRateNextD4 = 0.0;
-  double successRateNextD6 = 0.0;
-  double successRateNextD8 = 0.0;
-  double successRateNextD10 = 0.0;
-  double successRateNextD12 = 0.0;
-  double successRateNextD20 = 0.0;
+  Map<int, double> successRates = <int, double>{};
 
   SuccessRateCalculator calculator = SuccessRateCalculator();
 
@@ -35,12 +30,7 @@ class StateModel extends ChangeNotifier {
   StateModel(this._peerSharerStateModel);
 
   void refreshSuccessRate() async {
-    successRateNextD4 = 0.0;
-    successRateNextD6 = 0.0;
-    successRateNextD8 = 0.0;
-    successRateNextD10 = 0.0;
-    successRateNextD12 = 0.0;
-    successRateNextD20 = 0.0;
+    successRates = <int, double>{};
 
     if (_dices.isEmpty) {
       succesRate = 0;
@@ -65,31 +55,14 @@ class StateModel extends ChangeNotifier {
                 DiceWithSuccessRate(target, modifier, dices, succesRate));
             notifyListeners();
             break;
-          case "4":
-            successRateNextD4 = typedElement.entries.first.value;
-            notifyListeners();
-            break;
-          case "6":
-            successRateNextD6 = typedElement.entries.first.value;
-            notifyListeners();
-            break;
-          case "8":
-            successRateNextD8 = typedElement.entries.first.value;
-            notifyListeners();
-            break;
-          case "10":
-            successRateNextD10 = typedElement.entries.first.value;
-            notifyListeners();
-            break;
-          case "12":
-            successRateNextD12 = typedElement.entries.first.value;
-            notifyListeners();
-            break;
-          case "20":
-            successRateNextD20 = typedElement.entries.first.value;
-            notifyListeners();
-            break;
           default:
+            var parsedDiceType = int.tryParse(typedElement.entries.first.key);
+            if (parsedDiceType != null) {
+              successRates.putIfAbsent(
+                  parsedDiceType, () => typedElement.entries.first.value);
+              notifyListeners();
+            }
+            break;
         }
       }
     });

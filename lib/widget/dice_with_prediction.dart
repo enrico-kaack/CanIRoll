@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class DiceWithSuccessRatePrediction extends StatelessWidget {
   final int diceValue;
-  final double successRate;
+  final double? successRate;
   final Function() function;
 
   const DiceWithSuccessRatePrediction(
@@ -17,7 +17,7 @@ class DiceWithSuccessRatePrediction extends StatelessWidget {
       alignment: Alignment.bottomRight,
       children: [
         DiceButton(function, diceValue, Colors.black),
-        successRate.isFinite && successRate > 0.0
+        successRate != null && successRate!.isFinite && successRate! > 0.0
             ? Container(
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -26,7 +26,7 @@ class DiceWithSuccessRatePrediction extends StatelessWidget {
                 child: Padding(
                     padding: const EdgeInsets.all(3.0),
                     child: Text(
-                      (successRate * 100).toStringAsPrecision(3),
+                      (successRate! * 100).toStringAsPrecision(3),
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
