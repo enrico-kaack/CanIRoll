@@ -4,6 +4,8 @@ CanIRoll is an Android and iOS application to calculate the success rate of reac
 
 ## Screencast
 
+![screenrecording caniroll](docs/screen_recording/caniroll-screen-recording.gif)
+
 ## Features
 
 - Calculate the success rate of throwing multiple dices against a target sum with a static modifier.
